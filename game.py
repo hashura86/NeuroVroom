@@ -2,9 +2,11 @@ import pygame
 import random
 import time
 import math
+from utils.utils import extract_color_from_path
 from objects.car import Car
 from objects.gameState import GameState
 
+# function to create car in the bottom or top of the screen depending on 'x' value
 def create_car(color):
     x = random.uniform(*random.choices(spawn_intervals, weights=[0.5, 0.5], k=num_cars)[0])
     if x <= 0:
@@ -26,6 +28,7 @@ def create_car(color):
 
     return car
 
+
 pygame.init()
 
 clock = pygame.time.Clock()
@@ -45,11 +48,18 @@ background = pygame.image.load("assets/background.png").convert()
 colors = ["azul", "vermelho", "verde", "roxo", "cinza"]
 random_color = random.choice(colors)
 
+expected_color_index = colors.index(random_color)
+space_pressed = False
+
 font = pygame.font.Font('freesansbold.ttf', 32)
-text = font.render("aperte 'espaço' quando ver o carro " + random_color + " na tela", True, "white") 
+text = font.render("aperte 'espaço' quando ver o carro " + random_color + " na tela", True, "white")
+
 scoreMs = font.render("0 ms", True, "white")
 
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
+expected_color_path = car_colors[expected_color_index]
+expected_color = extract_color_from_path(expected_color_path)
+
 cars = []
 num_cars = 10
 
@@ -67,7 +77,7 @@ bwd_lanes = [450, 580]
 
 # spawn_gap = 10
 
-amplitude = 1  
+amplitude = 1
 frequency = .1 
 
 dot_spacing = 20
@@ -93,6 +103,10 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 paused = not paused
+                # space_pressed = not space_pressed
+                
+            # elif event.key == pygame.K_SPACE: mudar pause pra outra tecla
+            #     print('como q escrev')
                 
     if not paused:
         elapsed_time += 1
@@ -104,14 +118,14 @@ while running:
         for car in cars:
             car.move()
             
-            if car.rect.x > screen_width + 121: #screen_width + 120 = 1400 (ultimo spawn possivel na volta)
+            if car.rect.x > screen_width + 121: #screen_width + 120 = 1400 (last possible spawn in top)
 
                 cars.remove(car)
                 random_car_color = random.choice(car_colors)
                 new_car = create_car(random_car_color)    
                 cars.append(new_car)
 
-            elif car.rect.x < -301: # 300 é o primeiro spawn possivel na ida
+            elif car.rect.x < -301: # 300 is the first possible spawn in bottom
 
                 cars.remove(car)
                 random_car_color = random.choice(car_colors)
@@ -119,7 +133,11 @@ while running:
                 cars.append(new_car)  
 
             y_offset = amplitude * math.sin(frequency * elapsed_time)
-            car.rect.y += y_offset          
+            car.rect.y += y_offset  
+
+            # for expected in cars:
+            #     if space_pressed and expected.color == expected_color: 
+            #         print('parabéns vc é trouxa')    
             
             car.draw(screen)   
 
