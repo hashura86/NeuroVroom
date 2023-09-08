@@ -30,9 +30,6 @@ class Car(pygame.sprite.Sprite):
     def flip_image(self):
         self.image = pygame.transform.flip(self.image, True, False)
 
-    # @property
-    # def x (self):
-    #     return self.image.get_rect().x
     
 
     

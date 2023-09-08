@@ -4,44 +4,42 @@ import time
 import math
 from utils.utils import extract_color_from_path
 from objects.car import Car
-from objects.gameState import GameState
+
+# function to check collision in spawn
+def isColliding(new_car, existing_cars):
+    for existing_car in existing_cars:
+        if (new_car.rect.colliderect(existing_car.rect)):
+            return False
+    return True
+
 
 # function to create car in the bottom or top of the screen depending on 'x' value
 def create_car(color):
-    x = random.uniform(*random.choices(spawn_intervals, weights=[0.5, 0.5], k=num_cars)[0])
+    global car_count
+    x = random.uniform(*random.choices(spawn_intervals, weights = [0.5, 0.5], k = num_cars)[0])    
     if x <= 0:
         y = random.choice([bwd_lanes[0], bwd_lanes[1]])
         car = Car(color, x, y, False, random.randint(minSpeed, maxSpeed))
+
     else:
         y = random.choice([fwd_lanes[0], fwd_lanes[1]])
         car = Car(color, x, y, True, random.randint(minSpeed, maxSpeed))
         car.flip_image()
 
-    # valid_position = True
-    # for existing_car in cars:
-    #     if car.rect.colliderect(existing_car.rect):
-    #         valid_position = False
-    #         break
-
-    # if valid_position:
-    #     return car
-
-    return car
-
-
+    if isColliding(car,cars):
+        cars.append(car)
+    else:
+        car_count -= 1
+    
 pygame.init()
 
 clock = pygame.time.Clock()
-
-# game_state = GameState()
 
 screen_width = 1280
 screen_height = 720
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("<nome do jogo>")
-
-start_time = time.time()
 
 background = pygame.image.load("assets/background.png").convert()
 
@@ -61,7 +59,8 @@ expected_color_path = car_colors[expected_color_index]
 expected_color = extract_color_from_path(expected_color_path)
 
 cars = []
-num_cars = 10
+num_cars = 5
+car_count = 0
 
 minSpeed = 5
 maxSpeed = 20
@@ -75,7 +74,7 @@ spawn_intervals =[[-300, 0], [1280, 1400]]
 fwd_lanes = [200, 320]
 bwd_lanes = [450, 580]
 
-# spawn_gap = 10
+# spawn_gap = 50
 
 amplitude = 1
 frequency = .1 
@@ -86,58 +85,49 @@ redline = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 for y in range(0, screen_height, dot_spacing):
     pygame.draw.circle(redline, (255,0,0), (screen_width/2, y), 5)
 
-
 for _ in range(num_cars):
-
     random_car_color = random.choice(car_colors)
     car = create_car(random_car_color)
-    cars.append(car) 
+    car_count += 1
 
 paused = False
 
 running = True
 while running:
+ 
+    elapsed_time += 1
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 paused = not paused
-                # space_pressed = not space_pressed
-                
-            # elif event.key == pygame.K_SPACE: mudar pause pra outra tecla
-            #     print('como q escrev')
                 
     if not paused:
-        elapsed_time += 1
-
+        
         screen.blit(background, (0, 0))
         screen.blit(redline, (0, 0))
         screen.blit(background, (screen_width/2 + 5, 0))
         
         for car in cars:
             car.move()
-            
-            if car.rect.x > screen_width + 121: #screen_width + 120 = 1400 (last possible spawn in top)
 
+            if car.rect.x > screen_width + 121 or car.rect.x < -301: # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
                 cars.remove(car)
+                car_count -= 1
                 random_car_color = random.choice(car_colors)
-                new_car = create_car(random_car_color)    
-                cars.append(new_car)
+                new_car = create_car(random_car_color) 
+                car_count += 1   
 
-            elif car.rect.x < -301: # 300 is the first possible spawn in bottom
-
-                cars.remove(car)
+            if car_count < num_cars:
                 random_car_color = random.choice(car_colors)
-                new_car = create_car(random_car_color)    
-                cars.append(new_car)  
+                new_car = create_car(random_car_color)
+                car_count += 1
+                
 
             y_offset = amplitude * math.sin(frequency * elapsed_time)
             car.rect.y += y_offset  
-
-            # for expected in cars:
-            #     if space_pressed and expected.color == expected_color: 
-            #         print('parabéns vc é trouxa')    
             
             car.draw(screen)   
 
@@ -145,9 +135,6 @@ while running:
         screen.blit(scoreMs, (300,60))
 
         clock.tick(tickrate)
-
-        # game_state.handle_events(pygame.event.get())
-        # game_state.draw(screen)
 
         pygame.display.flip()
 
