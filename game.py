@@ -79,13 +79,22 @@ frequency = .1
 
 dot_spacing = 20
 
+
+easy_mode_lines = [490, 790]
+medium_mode_lines = [540, 740]
+hard_mode_lines = [580, 700]
+
+easy_gap = 150
+medium_gap = 100
+hard_gap = 60
+
 redline = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 for y in range(0, screen_height, dot_spacing):
-    pygame.draw.circle(redline, (255,0,0), (screen_width/2 + 60, y), 5)
+    pygame.draw.circle(redline, (255,0,0), (screen_width/2 + hard_gap, y), 5)
 
 redline2 = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 for y in range(0, screen_height, dot_spacing):
-    pygame.draw.circle(redline, (255,0,0), (screen_width/2 - 60, y), 5)
+    pygame.draw.circle(redline, (255,0,0), (screen_width/2 - hard_gap, y), 5)
 
 for _ in range(num_cars):
     random_car_color = random.choice(car_colors)
@@ -110,7 +119,7 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 for car in cars:
-                    if car.color == expected_color and (car.rect.x > 580 and car.rect.x <= 700) and not space_pressed:
+                    if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:
                         space_pressed = True
                         score += 1 
 
