@@ -1,5 +1,5 @@
 import pygame
-# from utils.utils import extract_color_from_path
+from utils.utils import extract_color_from_path
 
 class Car(pygame.sprite.Sprite):
 
@@ -13,7 +13,7 @@ class Car(pygame.sprite.Sprite):
         self.dir = dir
         self.width = self.image.get_width()
         self.height = self.image.get_height() 
-        # self.color = extract_color_from_path(image_path)
+        self.color = extract_color_from_path(image_path)
 
     def move(self):
 

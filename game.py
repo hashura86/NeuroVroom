@@ -1,6 +1,5 @@
 import pygame
 import random
-import time
 import math
 from utils.utils import *
 from objects.car import Car
@@ -40,10 +39,9 @@ colors = ["azul", "vermelho", "verde", "roxo", "cinza"]
 random_color = "verde"
 
 # expected_color_index = colors.index(random_color)
-space_pressed = False
 
 font = pygame.font.Font('freesansbold.ttf', 32)
-text = font.render("aperte 'espaço' quando ver o carro " + random_color + " na tela", True, "white")
+text = font.render("aperte 'espaço' quando o carro " + random_color + "passar pela area vermelha", True, "white")
 
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -55,8 +53,8 @@ score = 0
 
 # codigo mto complexow
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
-# expected_color_path = car_colors[expected_color_index]
-# expected_color = extract_color_from_path(expected_color_path)
+expected_color_path = car_colors[2]
+expected_color = extract_color_from_path(expected_color_path)
 
 cars = []
 num_cars = 5
@@ -96,12 +94,11 @@ for _ in range(num_cars):
     car = create_car(random_car_color)
     car_count += 1
 
+space_pressed = False
+
 paused = False
 
 running = True
-
-# next_green = random.randint(5,30)
-# print('spawn time:',next_green)
 
 while running:
     clock.tick(tickrate)
@@ -112,14 +109,17 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                paused = not paused
-                score += 1
+                for car in cars:
+                    if car.color == expected_color and (car.rect.x > 580 and car.rect.x <= 700) and not space_pressed:
+                        space_pressed = True
+                        score += 1 
 
         elif event.type == SPAWN_CAR:
             if not paused: 
                 create_car("assets/car-green.png") 
                 car_count += 1
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
+                space_pressed = False
                 print('[SPAWN]', seconds_to_min(game_time))
 
         elif event.type == pygame.USEREVENT:
@@ -127,24 +127,8 @@ while running:
                 game_time -= 1
                 if game_time <= 0:
                     running = False
-
-        # elif event.type == pygame.USEREVENT:
-        #     if not paused: 
-        #         game_time -= 1
-
-        #     if (300 - game_time) % (next_green + 1) == 0 and not green_car_spawned:
-        #         print('[SPAWN]', seconds_to_min(game_time))
-        #         print((300 - game_time) % (next_green + 1))
-        #         create_car("assets/car-green.png")
-        #         green_car_spawned = True
-        #         next_green = random.randint(5,7)
-        #         print('spawn time:',next_green)
-
-        #     elif (300 - game_time) % next_green != 0:
-        #         green_car_spawned = False
                
-                
-                
+                             
     if not paused:
         
         screen.blit(background, (0, 0))
@@ -177,14 +161,10 @@ while running:
             
             car.draw(screen)   
 
-        screen.blit(text, (300,20))
+        screen.blit(text, (200,20))
         screen.blit(time_text, (300,90))
         screen.blit(score_text, (300,120))
 
-        
-
-        # game_state.handle_events(pygame.event.get())
-        # game_state.draw(screen)
 
         pygame.display.flip()
 
