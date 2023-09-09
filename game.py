@@ -3,14 +3,9 @@ import random
 import time
 import math
 from utils.utils import seconds_to_min # extract_color_from_path
+from utils.utils import isColliding
 from objects.car import Car
 
-# function to check collision in spawn
-def isColliding(new_car, existing_cars):
-    for existing_car in existing_cars:
-        if (new_car.rect.colliderect(existing_car.rect)):
-            return False
-    return True
 
 
 # function to create car in the bottom or top of the screen depending on 'x' value
@@ -26,7 +21,7 @@ def create_car(color):
         car = Car(color, x, y, True, random.randint(minSpeed, maxSpeed))
         car.flip_image()
 
-    if isColliding(car,cars):
+    if isColliding(car,cars) or color == 'assets/car-green.png':
         cars.append(car)
     else:
         car_count -= 1

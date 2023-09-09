@@ -8,5 +8,12 @@ import datetime
 #     color = parts[-1]
 #     return color
 
+# function to check collision in spawn
+def isColliding(new_car, existing_cars):
+    for existing_car in existing_cars:
+        if (new_car.rect.colliderect(existing_car.rect)):
+            return False
+    return True
+
 def seconds_to_min(t:int):
     return str(datetime.timedelta(seconds=t))[2:]
