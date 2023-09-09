@@ -2,7 +2,7 @@ import pygame
 import random
 import time
 import math
-from utils.utils import extract_color_from_path
+from utils.utils import seconds_to_min # extract_color_from_path
 from objects.car import Car
 
 # function to check collision in spawn
@@ -39,31 +39,36 @@ screen_width = 1280
 screen_height = 720
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("<nome do jogo>")
+pygame.display.set_caption("comoqcaR")
 
 background = pygame.image.load("assets/background.png").convert()
 
 colors = ["azul", "vermelho", "verde", "roxo", "cinza"]
-random_color = random.choice(colors)
+# random_color = random.choice(colors)
+random_color = "verde"
 
-expected_color_index = colors.index(random_color)
+# expected_color_index = colors.index(random_color)
 space_pressed = False
 
 font = pygame.font.Font('freesansbold.ttf', 32)
 text = font.render("aperte 'espaço' quando ver o carro " + random_color + " na tela", True, "white")
 
-scoreMs = font.render("0 ms", True, "white")
+pygame.time.set_timer(pygame.USEREVENT, 1000)
+game_time = 300
 
+score = 0
+
+# codigo mto complexow
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
-expected_color_path = car_colors[expected_color_index]
-expected_color = extract_color_from_path(expected_color_path)
+# expected_color_path = car_colors[expected_color_index]
+# expected_color = extract_color_from_path(expected_color_path)
 
 cars = []
 num_cars = 5
 car_count = 0
 
 minSpeed = 5
-maxSpeed = 20
+maxSpeed = 10
 
 tickrate = 60
 
@@ -85,30 +90,57 @@ redline = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 for y in range(0, screen_height, dot_spacing):
     pygame.draw.circle(redline, (255,0,0), (screen_width/2, y), 5)
 
+redline2 = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+for y in range(0, screen_height, dot_spacing):
+    pygame.draw.circle(redline, (255,0,0), (screen_width/2 - 120, y), 5)
+
 for _ in range(num_cars):
     random_car_color = random.choice(car_colors)
+    while "green" in random_car_color:
+        random_car_color = random.choice(car_colors)
     car = create_car(random_car_color)
     car_count += 1
 
 paused = False
 
 running = True
-while running:
- 
-    elapsed_time += 1
 
+next_green = random.randint(5,30)
+print('spawn time:',next_green)
+
+while running:
+
+    elapsed_time += 1
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 paused = not paused
+                score += 1
+
+        elif event.type == pygame.USEREVENT:
+            if not paused: 
+                game_time -= 1
+            
+            if (300 - game_time) % (next_green + 1) == 0:
+                print('[SPAWN]', seconds_to_min(game_time))
+                print((300 - game_time) % (next_green + 1))
+                create_car("assets/car-green.png")
+                next_green = random.randint(5,7)
+                print('spawn time:',next_green)
+
+                
+                
                 
     if not paused:
         
         screen.blit(background, (0, 0))
         screen.blit(redline, (0, 0))
         screen.blit(background, (screen_width/2 + 5, 0))
+        time_text = font.render(seconds_to_min(game_time), True, "white")
+        score_text = font.render(str(score), True, "white")
         
         for car in cars:
             car.move()
@@ -117,24 +149,31 @@ while running:
                 cars.remove(car)
                 car_count -= 1
                 random_car_color = random.choice(car_colors)
+                while "green" in random_car_color:
+                    random_car_color = random.choice(car_colors)
                 new_car = create_car(random_car_color) 
                 car_count += 1   
 
             if car_count < num_cars:
                 random_car_color = random.choice(car_colors)
+                while "green" in random_car_color:
+                    random_car_color = random.choice(car_colors)
                 new_car = create_car(random_car_color)
                 car_count += 1
                 
-
             y_offset = amplitude * math.sin(frequency * elapsed_time)
             car.rect.y += y_offset  
             
             car.draw(screen)   
 
         screen.blit(text, (300,20))
-        screen.blit(scoreMs, (300,60))
+        screen.blit(time_text, (300,90))
+        screen.blit(score_text, (300,120))
 
         clock.tick(tickrate)
+
+        # game_state.handle_events(pygame.event.get())
+        # game_state.draw(screen)
 
         pygame.display.flip()
 
