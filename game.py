@@ -125,6 +125,7 @@ while running:
         elif event.type == SPAWN_CAR:
             if not paused: 
                 create_car("assets/car-green.png") 
+                car_count += 1
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
                 print('[SPAWN]', seconds_to_min(game_time))
 
