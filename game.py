@@ -54,6 +54,8 @@ font = pygame.font.Font('freesansbold.ttf', 32)
 text = font.render("aperte 'espaço' quando ver o carro " + random_color + " na tela", True, "white")
 
 pygame.time.set_timer(pygame.USEREVENT, 1000)
+SPAWN_CAR = pygame.USEREVENT + 1
+pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 30000))
 game_time = 300
 
 score = 0
@@ -105,11 +107,11 @@ paused = False
 
 running = True
 
-next_green = random.randint(5,30)
-print('spawn time:',next_green)
+# next_green = random.randint(5,30)
+# print('spawn time:',next_green)
 
 while running:
-
+    clock.tick(tickrate)
     elapsed_time += 1
     
     for event in pygame.event.get():
@@ -120,18 +122,33 @@ while running:
                 paused = not paused
                 score += 1
 
+        elif event.type == SPAWN_CAR:
+            if not paused: 
+                create_car("assets/car-green.png") 
+                pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
+                print('[SPAWN]', seconds_to_min(game_time))
+
         elif event.type == pygame.USEREVENT:
             if not paused: 
                 game_time -= 1
-            
-            if (300 - game_time) % (next_green + 1) == 0:
-                print('[SPAWN]', seconds_to_min(game_time))
-                print((300 - game_time) % (next_green + 1))
-                create_car("assets/car-green.png")
-                next_green = random.randint(5,7)
-                print('spawn time:',next_green)
+                if game_time <= 0:
+                    running = False
 
-                
+        # elif event.type == pygame.USEREVENT:
+        #     if not paused: 
+        #         game_time -= 1
+
+        #     if (300 - game_time) % (next_green + 1) == 0 and not green_car_spawned:
+        #         print('[SPAWN]', seconds_to_min(game_time))
+        #         print((300 - game_time) % (next_green + 1))
+        #         create_car("assets/car-green.png")
+        #         green_car_spawned = True
+        #         next_green = random.randint(5,7)
+        #         print('spawn time:',next_green)
+
+        #     elif (300 - game_time) % next_green != 0:
+        #         green_car_spawned = False
+               
                 
                 
     if not paused:
@@ -170,7 +187,7 @@ while running:
         screen.blit(time_text, (300,90))
         screen.blit(score_text, (300,120))
 
-        clock.tick(tickrate)
+        
 
         # game_state.handle_events(pygame.event.get())
         # game_state.draw(screen)
