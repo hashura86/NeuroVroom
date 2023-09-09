@@ -2,11 +2,8 @@ import pygame
 import random
 import time
 import math
-from utils.utils import seconds_to_min # extract_color_from_path
-from utils.utils import isColliding
+from utils.utils import *
 from objects.car import Car
-
-
 
 # function to create car in the bottom or top of the screen depending on 'x' value
 def create_car(color):
@@ -49,6 +46,7 @@ font = pygame.font.Font('freesansbold.ttf', 32)
 text = font.render("aperte 'espaço' quando ver o carro " + random_color + " na tela", True, "white")
 
 pygame.time.set_timer(pygame.USEREVENT, 1000)
+
 SPAWN_CAR = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 30000))
 game_time = 300
@@ -85,11 +83,11 @@ dot_spacing = 20
 
 redline = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 for y in range(0, screen_height, dot_spacing):
-    pygame.draw.circle(redline, (255,0,0), (screen_width/2, y), 5)
+    pygame.draw.circle(redline, (255,0,0), (screen_width/2 + 60, y), 5)
 
 redline2 = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
 for y in range(0, screen_height, dot_spacing):
-    pygame.draw.circle(redline, (255,0,0), (screen_width/2 - 120, y), 5)
+    pygame.draw.circle(redline, (255,0,0), (screen_width/2 - 60, y), 5)
 
 for _ in range(num_cars):
     random_car_color = random.choice(car_colors)
@@ -150,8 +148,8 @@ while running:
     if not paused:
         
         screen.blit(background, (0, 0))
-        screen.blit(redline, (0, 0))
         screen.blit(background, (screen_width/2 + 5, 0))
+        screen.blit(redline, (0, 0))
         time_text = font.render(seconds_to_min(game_time), True, "white")
         score_text = font.render(str(score), True, "white")
         
