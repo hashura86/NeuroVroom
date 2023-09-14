@@ -43,7 +43,6 @@ def create_redlines(screen_width, screen_height, dot_spacing, gap):
     
     return redline
 
-
 # function to create car in the bottom or top of the screen depending on 'x' value
 def create_car(color):
     global car_count
@@ -120,7 +119,7 @@ sin_moviment = True
 
 # easy_mode_lines = [490, 790]
 # medium_mode_lines = [540, 740]
-hard_mode_lines = [550, 720]
+hard_mode_lines = [550, 720] # 580 - 700
 
 easy_gap = 150
 medium_gap = 100
@@ -142,79 +141,22 @@ space_pressed = False
 paused = False
 running = True
 
-game_state = GameState.change_state(game_state, GameState.menu)
-
 for _ in range(num_cars):
     random_car_color = random.choice(car_colors)
     check_green("green")
     car = create_car(random_car_color)
 
+game_state = GameState.change_state(GameState.menu)
+
 while running:
+
     clock.tick(tickrate)
     elapsed_time += 1
-    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-        elif game_state == GameState.menu:
-
-            draw_scenario(screen, 0, 0, 'assets/menu.png')
-            
-            for i, option in enumerate(menu_options):
-                if i == selected_option:
-                    draw_text(screen, option, (255, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
-                else:
-                    draw_text(screen, option, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
-            
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_UP]:
-                selected_option = (selected_option - 1) % len(menu_options)
-            elif keys[pygame.K_DOWN]:
-                selected_option = (selected_option + 1) % len(menu_options)
-
-            if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
-                if selected_option == 0:
-                    game_state = GameState.change_state(game_state, GameState.game)
-                elif selected_option == 1:
-                    game_state = GameState.change_state(game_state, GameState.about)
-                elif selected_option == 2:
-                    game_state = GameState.change_state(game_state, GameState.score)
-                elif selected_option == 3:
-                    running = False
-
-        elif game_state == GameState.game:
-
-
-            draw_scenario(screen, 0, 0, 'assets/background.png')
-            draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
-            draw_scenario(screen, 0, 0, '', redline)
-
-            if not paused:
-                
-                for car in cars:
-                    car.move()
-
-                    if car.rect.x > screen_width + 121 or car.rect.x < -301: # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
-                        cars.remove(car)
-                        car_count -= 1
-                        random_car_color = random.choice(car_colors)
-                        check_green("green")
-                        new_car = create_car(random_car_color) 
-
-                    if car_count < num_cars: # force to always have <num_cars> cars on the screen
-                        random_car_color = random.choice(car_colors)
-                        check_green("green")
-                        new_car = create_car(random_car_color)
-                    
-                    check_sin_move(sin_moviment)
-                    car.draw(screen)   
-
-                draw_text(screen, "aperte 'espaço' quando o carro " + random_color + " passar pela area vermelha", 'white', 200, 20)
-                draw_text(screen, seconds_to_min(game_time), 'white', 300, 90)
-                draw_text(screen, str(score), 'white', 300, 120)
-
-            if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_f:
                     fullscreen = not fullscreen
                     if fullscreen:
@@ -222,27 +164,94 @@ while running:
                     else:
                         screen = pygame.display.set_mode((screen_width, screen_height))
 
-                if event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_SPACE:
                     for car in cars:
                         if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
                             print(car.rect.x)
                             space_pressed = True
                             score += 1
-                if event.key == pygame.K_CAPSLOCK:
+                elif event.key == pygame.K_CAPSLOCK:
                     paused = not paused
                         
-            elif event.type == SPAWN_CAR:
-                if not paused: 
-                    create_car("assets/car-green.png") 
-                    pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
-                    space_pressed = False
-                    print('[SPAWN]', seconds_to_min(game_time))
+        elif event.type == SPAWN_CAR and game_state == GameState.game:
+            if not paused: 
+                create_car("assets/car-green.png") 
+                pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
+                space_pressed = False
+                print('[SPAWN]', seconds_to_min(game_time))
 
-            elif event.type == pygame.USEREVENT:
-                if not paused: 
-                    game_time -= 1
-                    if game_time <= 0:
-                        running = False
+        if event.type == pygame.USEREVENT:
+            if not paused and game_state == GameState.game: 
+                game_time -= 1
+                if game_time <= 0:
+                    running = False
+                    
+
+    if game_state == GameState.menu:
+        
+        draw_scenario(screen, 0, 0, 'assets/menu.png')
+
+        for i, option in enumerate(menu_options):
+            if i == selected_option:
+                draw_text(screen, option, (255, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
+            else:
+                draw_text(screen, option, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
+            
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+                selected_option = (selected_option - 1) % len(menu_options)
+        elif keys[pygame.K_DOWN]:
+            selected_option = (selected_option + 1) % len(menu_options)
+
+        if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
+        
+            if selected_option == 0:
+                game_state = GameState.change_state(GameState.game)
+            elif selected_option == 1:
+                game_state = GameState.change_state(GameState.about)
+            elif selected_option == 2:
+                game_state = GameState.change_state(GameState.score)
+            elif selected_option == 3:
+                running = False
+
+    elif game_state == GameState.game:
+
+        if not paused:
+
+            draw_scenario(screen, 0, 0, 'assets/background.png')
+            draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
+            draw_scenario(screen, 0, 0, '', redline)
+
+            draw_text(screen, "aperte 'espaço' quando o carro " + random_color + " passar pela área vermelha", 'white', 200, 20)
+            draw_text(screen, seconds_to_min(game_time), 'white', 300, 90)
+            draw_text(screen, str(score), 'white', 300, 120)
+                
+            for car in cars:
+                car.move()
+
+                if car.rect.x > screen_width + 121 or car.rect.x < -301: # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
+                    cars.remove(car)
+                    car_count -= 1
+                    random_car_color = random.choice(car_colors)
+                    check_green("green")
+                    new_car = create_car(random_car_color) 
+
+                if car_count < num_cars: # force to always have <num_cars> cars on the screen
+                    random_car_color = random.choice(car_colors)
+                    check_green("green")
+                    new_car = create_car(random_car_color)
+                    
+                check_sin_move(sin_moviment)
+                car.draw(screen)   
+
+
+        elif game_state == GameState.score:
+
+            draw_scenario(screen, 0, 0, 'assets/menu.png')
+
+        elif game_state == GameState.about:
+
+            draw_scenario(screen, 0, 0, 'assets/menu.png')
                
                              
         pygame.display.flip()
