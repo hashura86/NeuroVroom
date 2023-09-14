@@ -30,6 +30,7 @@ def draw_scenario(surface, x, y, image_path = '', surface_target = ''):
 
 # function to draw text on screen 
 def draw_text(surface, text, color, x, y):
+    font = pygame.font.Font('freesansbold.ttf', 32)
     text_str = font.render(text, True, color)
     surface.blit(text_str, (x,y))
         
@@ -79,8 +80,6 @@ colors = ["azul", "vermelho", "verde", "roxo", "cinza"]
 # random_color = random.choice(colors)
 random_color = "verde"
 # expected_color_index = colors.index(random_color)
-
-font = pygame.font.Font('freesansbold.ttf', 32)
 
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -196,12 +195,25 @@ while running:
                 draw_text(screen, option, (255, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
             else:
                 draw_text(screen, option, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
-            
+
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-                selected_option = (selected_option - 1) % len(menu_options)
-        elif keys[pygame.K_DOWN]:
-            selected_option = (selected_option + 1) % len(menu_options)
+        # Adicione variáveis para controlar a última tecla pressionada
+        up_pressed = keys[pygame.K_UP]
+        down_pressed = keys[pygame.K_DOWN]
+
+        if up_pressed:
+            selected_option = (selected_option - 1) % len(menu_options) if not last_up_pressed else selected_option
+            last_up_pressed = True
+
+        if down_pressed:
+            selected_option = (selected_option + 1) % len(menu_options) if not last_down_pressed else selected_option
+            last_down_pressed = True
+
+        if not up_pressed:
+            last_up_pressed = False
+
+        if not down_pressed:
+            last_down_pressed = False
 
         if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
         
@@ -213,6 +225,8 @@ while running:
                 game_state = GameState.change_state(GameState.score)
             elif selected_option == 3:
                 running = False
+
+        pygame.display.update()
 
     elif game_state == GameState.game:
 
@@ -248,6 +262,7 @@ while running:
         elif game_state == GameState.score:
 
             draw_scenario(screen, 0, 0, 'assets/menu.png')
+            
 
         elif game_state == GameState.about:
 
