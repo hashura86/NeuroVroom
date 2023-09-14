@@ -14,13 +14,13 @@ def check_sin_move(movement):
         y_offset = amplitude * math.sin(frequency * elapsed_time)
         car.rect.y += y_offset 
 
-# function to check if generated car is green
+# function to generate other car color if appears a green one
 def check_green(color):
     global random_car_color
     while color in random_car_color:
         random_car_color = random.choice(car_colors)
 
-#function to draw scenario by img path or other surface (like redline)
+# function to draw scenario by img path or other surface (like redline)
 def draw_scenario(surface, x, y, image_path = '', surface_target = ''):
     if surface_target == '':
         new_surface = pygame.image.load(image_path).convert()
@@ -156,6 +156,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
+                
+                # enable fullscreen mode
                 if event.key == pygame.K_f:
                     fullscreen = not fullscreen
                     if fullscreen:
@@ -163,15 +165,20 @@ while running:
                     else:
                         screen = pygame.display.set_mode((screen_width, screen_height))
 
-                elif event.key == pygame.K_SPACE:
+                # hit space buttom to score (or not) a point
+                if event.key == pygame.K_SPACE:
                     for car in cars:
                         if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
                             print(car.rect.x)
                             space_pressed = True
                             score += 1
-                elif event.key == pygame.K_CAPSLOCK:
+
+                # caps lock to pause game 
+                if event.key == pygame.K_CAPSLOCK:
                     paused = not paused
-                        
+                    
+
+        # event to spawn cars, and the first car spawns in different time interval                
         elif event.type == SPAWN_CAR and game_state == GameState.game:
             if not paused: 
                 create_car("assets/car-green.png") 
@@ -179,6 +186,7 @@ while running:
                 space_pressed = False
                 print('[SPAWN]', seconds_to_min(game_time))
 
+        # USEREVENT to decrease game_time
         if event.type == pygame.USEREVENT:
             if not paused and game_state == GameState.game: 
                 game_time -= 1
@@ -197,7 +205,7 @@ while running:
                 draw_text(screen, option, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
 
         keys = pygame.key.get_pressed()
-        # Adicione variáveis para controlar a última tecla pressionada
+
         up_pressed = keys[pygame.K_UP]
         down_pressed = keys[pygame.K_DOWN]
 
