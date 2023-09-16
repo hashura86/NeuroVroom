@@ -2,43 +2,46 @@ import pygame, pygame.mixer
 import random
 import math
 import datetime
+import re
 from utils.utils import *
 from objects.car import Car
 from states.gameState import GameState
 
-def draw_configuration_screen(screen, player_name, min_speed, max_speed):
-    global active_name, input_rect
+def draw_configuration_screen(screen):
+
+    global active_name, input_rect, player_name, min_speed, max_speed, input_min_speed_rect, input_max_speed_rect
+
     screen.fill((173, 216, 230)) 
 
     font = pygame.font.Font(None, 36)
 
     draw_text(screen, 'Nome do paciente:', 25, 'black', 50, 100)
-
     color = (255, 0, 0) if active_name else (0, 0, 0)
     pygame.draw.rect(screen, color, input_rect , 2)  
-
     text_input = font.render(player_name, True, (0, 0, 0))
+    screen.blit(text_input, (305, 105))
+    
+    draw_text(screen, 'Velocidade mínima dos carros:', 19, 'black', 50, 250)
+    draw_text(screen, 'Velocidade máxima dos carros:', 19, 'black', 50, 300)   
 
-    screen.blit(text_input, (325, 105))
+    color_min = (255, 0, 0) if active_min_speed else (0, 0, 0)
+    pygame.draw.rect(screen, color_min, input_min_speed_rect, 2)
+    text_input_min_speed = font.render(str(min_speed), True, (0, 0, 0))
+    screen.blit(text_input_min_speed, (455, 255))
 
-    text = font.render("Velocidade dos Carros:", True, (0, 0, 0))
-    screen.blit(text, (50, 200))
-    text = font.render("Min:", True, (0, 0, 0))
-    screen.blit(text, (400, 200))
-    text_input = font.render(str(min_speed), True, (0, 0, 0))
-    screen.blit(text_input, (480, 205))
-    text = font.render("Max:", True, (0, 0, 0))
-    screen.blit(text, (500, 200))
-    text_input = font.render(str(max_speed), True, (0, 0, 0))
-    screen.blit(text_input, (590, 205))
+    color_max = (255, 0, 0) if active_max_speed else (0, 0, 0)
+    pygame.draw.rect(screen, color_max, input_max_speed_rect, 2)
+    text_input_max_speed = font.render(str(max_speed), True, (0, 0, 0))
+    screen.blit(text_input_max_speed, (455, 305))
 
-    pygame.draw.rect(screen, (0, 0, 255), (200, 300, 200, 50))
+    pygame.draw.rect(screen, (0, 0, 255), (200, 500, 200, 50))
     text = font.render("Iniciar Jogo", True, (255, 255, 255))
-    screen.blit(text, (250, 310))
+    screen.blit(text, (250, 512))
 
-    pygame.draw.rect(screen, (0, 0, 255), (400, 300, 200, 50))
+    pygame.draw.rect(screen, (0, 0, 255), (400, 500, 200, 50))
     text = font.render("Voltar", True, (255, 255, 255))
-    screen.blit(text, (450, 310))
+    screen.blit(text, (450, 512))
+
 
 # function to activate/deactivate sound player
 def play_music(path):
@@ -69,12 +72,12 @@ def create_car(color):
     x = random.uniform(*random.choices(spawn_intervals, weights = [0.5, 0.5], k = num_cars)[0])    
     if x <= 0:
         y = random.choice([bwd_lanes[0], bwd_lanes[1]])
-        car = Car(color, x, y, False, random.randint(minSpeed, maxSpeed))
+        car = Car(color, x, y, False, random.randint(min_speed, max_speed))
         car_count += 1
 
     else:
         y = random.choice([fwd_lanes[0], fwd_lanes[1]])
-        car = Car(color, x, y, True, random.randint(minSpeed, maxSpeed))
+        car = Car(color, x, y, True, random.randint(min_speed, max_speed))
         car_count += 1
         car.flip_image()
 
@@ -86,7 +89,6 @@ def create_car(color):
 pygame.init()
 pygame.mixer.init()
 
-
 clock = pygame.time.Clock()
 
 screen_width = 1280
@@ -96,7 +98,6 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("comoqcaR")
 
 music_started = False
-
 
 fullscreen = False
 
@@ -124,8 +125,15 @@ cars = []
 num_cars = 5
 car_count = 0
 
-minSpeed = 5
-maxSpeed = 10
+
+# min_speed_ui = '0'
+# max_speed_ui = '1'
+
+# min_speed = string_to_integer(min_speed_ui)
+# max_speed = string_to_integer(max_speed_ui)
+
+min_speed = ''
+max_speed = ''
 
 tickrate = 60
 
@@ -138,7 +146,7 @@ bwd_lanes = [450, 580]
 
 amplitude = 1
 frequency = .1 
-sin_moviment = True
+sin_moviment = False
 
 # easy_mode_lines = [490, 790]
 # medium_mode_lines = [540, 740]
@@ -164,18 +172,26 @@ space_pressed = False
 paused = False
 running = True
 
+input_rect = pygame.Rect(300, 100, 300, 36)
+input_min_speed_rect = pygame.Rect(450, 250, 50, 36)
+input_max_speed_rect = pygame.Rect(450, 300, 50, 36)
+
+active_name = False
+active_max_speed = False
+active_min_speed = False
 
 player_name = ''
-input_rect = pygame.Rect(300, 100, 300, 36)
-active_name = False
-max_chars = 20
+max_chars = 19
+max_speed_chars = 2
 
-for _ in range(num_cars):
-    random_car_color = random.choice(car_colors)
-    check_green("green")
-    car = create_car(random_car_color)
 
 game_state = GameState.change_state(GameState.menu)
+
+if game_state == GameState.game:
+    for _ in range(num_cars):
+        random_car_color = random.choice(car_colors)
+        check_green("green")
+        car = create_car(random_car_color)
 
 while running:
 
@@ -189,8 +205,20 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if input_rect.collidepoint(event.pos):
                 active_name = True
+                active_min_speed = False  
+                active_max_speed = False 
+            elif input_min_speed_rect.collidepoint(event.pos):
+                active_min_speed = True
+                active_name = False  
+                active_max_speed = False  
+            elif input_max_speed_rect.collidepoint(event.pos):
+                active_max_speed = True
+                active_name = False  
+                active_min_speed = False 
             else:
                 active_name = False
+                active_min_speed = False
+                active_max_speed = False
 
         elif event.type == pygame.KEYDOWN:
 
@@ -202,11 +230,41 @@ while running:
                     elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
                         pass
                     else:   
-                        if len(player_name) < max_chars:  
+                        if len(player_name) < max_chars and event.unicode.isalpha():  
                             player_name += event.unicode
+
+                if active_min_speed:
+                    if event.key == pygame.K_BACKSPACE:
+                        min_speed = min_speed[:-1]
+                    elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
+                        pass
+                    else:
+                        if len(min_speed) == 0 and event.unicode.isalpha():
+                            pass
+                        elif len(min_speed) < max_speed_chars:
+                            if not min_speed and event.unicode == '0':
+                                pass
+                            elif event.unicode.isdigit():
+                                min_speed += event.unicode
+
+
+                if active_max_speed:
+                    if event.key == pygame.K_BACKSPACE:
+                        max_speed = max_speed[:-1]
+                    elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
+                        pass
+                    else:
+                        if len(max_speed) == 0 and event.unicode.isalpha():
+                            pass
+                        elif len(max_speed) < max_speed_chars:
+                            if not max_speed and event.unicode == '0':
+                                pass
+                            elif event.unicode.isdigit():
+                                max_speed += event.unicode
 
                     
             if game_state == GameState.game:   
+                
                 # disable/enable sound
                 if event.key == pygame.K_m:
                     if pygame.mixer.music.get_volume() > 0:
@@ -230,9 +288,13 @@ while running:
                             space_pressed = True
                             score += 1
 
-                # caps lock to pause game 
+                # caps lock to pause game (and music too :p)
                 if event.key == pygame.K_CAPSLOCK:
                     paused = not paused
+                    if pygame.mixer.music.get_busy(): 
+                        pygame.mixer.music.pause() 
+                    else:
+                        pygame.mixer.music.unpause()
 
 
         # event to spawn cars, and the first car spawns in different time interval                
@@ -254,7 +316,8 @@ while running:
 
     if game_state == GameState.menu:
         
-        draw_scenario(screen, 0, 0, 'assets/menu.png')
+        # draw_scenario(screen, 0, 0, 'assets/menu.png')
+        screen.fill((173, 216, 230)) 
 
         for i, option in enumerate(menu_options):
             if i == selected_option:
@@ -296,7 +359,7 @@ while running:
 
     elif game_state == GameState.config:
 
-        draw_configuration_screen(screen, player_name, 3, 5)
+        draw_configuration_screen(screen)
         pygame.display.update()
 
 
@@ -335,12 +398,14 @@ while running:
 
         elif game_state == GameState.score:
 
-            draw_scenario(screen, 0, 0, 'assets/menu.png')
+            # draw_scenario(screen, 0, 0, 'assets/menu.png')
+            screen.fill((173, 216, 230)) 
             
 
         elif game_state == GameState.about:
 
-            draw_scenario(screen, 0, 0, 'assets/menu.png')
+            # draw_scenario(screen, 0, 0, 'assets/menu.png')
+            screen.fill((173, 216, 230)) 
                
                              
         pygame.display.flip()

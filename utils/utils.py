@@ -1,6 +1,13 @@
 import os , datetime, pygame
 
 
+def string_to_integer(input_str):
+    try:
+        result = int(input_str)
+        return result
+    except ValueError:
+        return "Error: Input cannot be converted to an integer"
+
 # function to draw text on screen 
 def draw_text(surface, text, size, color, x, y):
     font = pygame.font.Font('freesansbold.ttf', size)
