@@ -17,7 +17,6 @@ def draw_configuration_screen(screen, player_name, min_speed, max_speed):
     color = (255, 0, 0) if active_name else (0, 0, 0)
     pygame.draw.rect(screen, color, input_rect , 2)  
 
-
     text_input = font.render(player_name, True, (0, 0, 0))
 
     screen.blit(text_input, (325, 105))
@@ -200,39 +199,40 @@ while running:
                 if active_name == True:
                     if event.key == pygame.K_BACKSPACE:
                         player_name = player_name[:-1]   
+                    elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
+                        pass
                     else:   
                         if len(player_name) < max_chars:  
                             player_name += event.unicode
 
                     
-                
+            if game_state == GameState.game:   
+                # disable/enable sound
+                if event.key == pygame.K_m:
+                    if pygame.mixer.music.get_volume() > 0:
+                        pygame.mixer.music.set_volume(0)
+                    else:
+                        pygame.mixer.music.set_volume(0.5)
 
-            # disable/enable sound
-            if event.key == pygame.K_m:
-                if pygame.mixer.music.get_volume() > 0:
-                    pygame.mixer.music.set_volume(0)
-                else:
-                    pygame.mixer.music.set_volume(0.5)
+                # enable/disable fullscreen mode
+                if event.key == pygame.K_f:
+                    fullscreen = not fullscreen
+                    if fullscreen:
+                        screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+                    else:
+                        screen = pygame.display.set_mode((screen_width, screen_height))
 
-            # enable/disable fullscreen mode
-            if event.key == pygame.K_f:
-                fullscreen = not fullscreen
-                if fullscreen:
-                    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
-                else:
-                    screen = pygame.display.set_mode((screen_width, screen_height))
+                # hit space buttom to score (or not) a point
+                if event.key == pygame.K_SPACE:
+                    for car in cars:
+                        if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
+                            print(car.rect.x)
+                            space_pressed = True
+                            score += 1
 
-            # hit space buttom to score (or not) a point
-            if event.key == pygame.K_SPACE:
-                for car in cars:
-                    if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
-                        print(car.rect.x)
-                        space_pressed = True
-                        score += 1
-
-            # caps lock to pause game 
-            if event.key == pygame.K_CAPSLOCK:
-                paused = not paused
+                # caps lock to pause game 
+                if event.key == pygame.K_CAPSLOCK:
+                    paused = not paused
 
 
         # event to spawn cars, and the first car spawns in different time interval                
