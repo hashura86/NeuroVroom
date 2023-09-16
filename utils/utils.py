@@ -2,8 +2,8 @@ import os , datetime, pygame
 
 
 # function to draw text on screen 
-def draw_text(surface, text, color, x, y):
-    font = pygame.font.Font('freesansbold.ttf', 32)
+def draw_text(surface, text, size, color, x, y):
+    font = pygame.font.Font('freesansbold.ttf', size)
     text_str = font.render(text, True, color)
     surface.blit(text_str, (x,y))
 

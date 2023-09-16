@@ -7,29 +7,31 @@ from objects.car import Car
 from states.gameState import GameState
 
 def draw_configuration_screen(screen, player_name, min_speed, max_speed):
-    screen.fill((255, 255, 255))  # Preencher a tela com branco ou outro fundo
+    global active_name, input_rect
+    screen.fill((173, 216, 230)) 
 
-    # Desenhar elementos da tela de configuração, como caixas de texto e botões
     font = pygame.font.Font(None, 36)
 
-    # Nome do paciente
-    text = font.render("Nome do Paciente:", True, (0, 0, 0))
-    screen.blit(text, (50, 100))
-    pygame.draw.rect(screen, (0, 0, 0), (250, 100, 300, 36), 2)  # Caixa de texto
-    text_input = font.render(player_name, True, (0, 0, 0))
-    screen.blit(text_input, (255, 105))
+    draw_text(screen, 'Nome do paciente:', 25, 'black', 50, 100)
 
-    # Velocidade dos carros
+    color = (255, 0, 0) if active_name else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_rect , 2)  
+
+
+    text_input = font.render(player_name, True, (0, 0, 0))
+
+    screen.blit(text_input, (325, 105))
+
     text = font.render("Velocidade dos Carros:", True, (0, 0, 0))
     screen.blit(text, (50, 200))
     text = font.render("Min:", True, (0, 0, 0))
-    screen.blit(text, (250, 200))
-    text_input = font.render(str(min_speed), True, (0, 0, 0))
-    screen.blit(text_input, (300, 205))
-    text = font.render("Max:", True, (0, 0, 0))
     screen.blit(text, (400, 200))
+    text_input = font.render(str(min_speed), True, (0, 0, 0))
+    screen.blit(text_input, (480, 205))
+    text = font.render("Max:", True, (0, 0, 0))
+    screen.blit(text, (500, 200))
     text_input = font.render(str(max_speed), True, (0, 0, 0))
-    screen.blit(text_input, (450, 205))
+    screen.blit(text_input, (590, 205))
 
     pygame.draw.rect(screen, (0, 0, 255), (200, 300, 200, 50))
     text = font.render("Iniciar Jogo", True, (255, 255, 255))
@@ -159,12 +161,15 @@ selected_option = 0 # index of menu_options
 menu_options = ['iniciar jogo', 'sobre o jogo', 'pontuações', 'sair do jogo']
 menu_options_gap = 70
 
-input_active = True
 space_pressed = False
 paused = False
 running = True
 
+
 player_name = ''
+input_rect = pygame.Rect(300, 100, 300, 36)
+active_name = False
+max_chars = 20
 
 for _ in range(num_cars):
     random_car_color = random.choice(car_colors)
@@ -181,38 +186,54 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if input_rect.collidepoint(event.pos):
+                active_name = True
+            else:
+                active_name = False
+
         elif event.type == pygame.KEYDOWN:
+
+            # type player name/click in the input box
+            if game_state == GameState.config:
+                if active_name == True:
+                    if event.key == pygame.K_BACKSPACE:
+                        player_name = player_name[:-1]   
+                    else:   
+                        if len(player_name) < max_chars:  
+                            player_name += event.unicode
+
+                    
                 
-                # disable/enable sound
-                if event.key == pygame.K_m:
-                    if pygame.mixer.music.get_volume() > 0:
-                        pygame.mixer.music.set_volume(0)
-                    else:
-                        pygame.mixer.music.set_volume(0.5)
 
-                # enable/disable fullscreen mode
-                if event.key == pygame.K_f:
-                    fullscreen = not fullscreen
-                    if fullscreen:
-                        screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
-                    else:
-                        screen = pygame.display.set_mode((screen_width, screen_height))
+            # disable/enable sound
+            if event.key == pygame.K_m:
+                if pygame.mixer.music.get_volume() > 0:
+                    pygame.mixer.music.set_volume(0)
+                else:
+                    pygame.mixer.music.set_volume(0.5)
 
-                # hit space buttom to score (or not) a point
-                if event.key == pygame.K_SPACE:
-                    for car in cars:
-                        if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
-                            print(car.rect.x)
-                            space_pressed = True
-                            score += 1
+            # enable/disable fullscreen mode
+            if event.key == pygame.K_f:
+                fullscreen = not fullscreen
+                if fullscreen:
+                    screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
+                else:
+                    screen = pygame.display.set_mode((screen_width, screen_height))
 
-                # caps lock to pause game 
-                if event.key == pygame.K_CAPSLOCK:
-                    paused = not paused
+            # hit space buttom to score (or not) a point
+            if event.key == pygame.K_SPACE:
+                for car in cars:
+                    if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
+                        print(car.rect.x)
+                        space_pressed = True
+                        score += 1
 
-        # elif event.type == pygame.TEXTINPUT:
-        #     if input_active:
-        #         player_name += event.text        
+            # caps lock to pause game 
+            if event.key == pygame.K_CAPSLOCK:
+                paused = not paused
+
 
         # event to spawn cars, and the first car spawns in different time interval                
         elif event.type == SPAWN_CAR and game_state == GameState.game:
@@ -228,6 +249,7 @@ while running:
                 game_time -= 1
                 if game_time <= 0:
                     running = False
+
                     
 
     if game_state == GameState.menu:
@@ -236,9 +258,9 @@ while running:
 
         for i, option in enumerate(menu_options):
             if i == selected_option:
-                draw_text(screen, option, (255, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
+                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
             else:
-                draw_text(screen, option, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
+                draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
 
         keys = pygame.key.get_pressed()
 
@@ -262,7 +284,7 @@ while running:
         if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
         
             if selected_option == 0:
-                game_state = GameState.change_state(GameState.game)
+                game_state = GameState.change_state(GameState.config)
             elif selected_option == 1:
                 game_state = GameState.change_state(GameState.about)
             elif selected_option == 2:
@@ -274,7 +296,7 @@ while running:
 
     elif game_state == GameState.config:
 
-        draw_configuration_screen(screen, 'jo', 3, 5)
+        draw_configuration_screen(screen, player_name, 3, 5)
         pygame.display.update()
 
 
@@ -288,9 +310,9 @@ while running:
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
 
-            draw_text(screen, "aperte 'espaço' quando o carro " + random_color + " passar pela área vermelha", 'white', 200, 20)
-            draw_text(screen, seconds_to_min(game_time), 'white', 300, 90)
-            draw_text(screen, str(score), 'white', 300, 120)
+            draw_text(screen, "aperte 'espaço' quando o carro " + random_color + " passar pela área vermelha", 32, 'white', 200, 20)
+            draw_text(screen, seconds_to_min(game_time), 32, 'white', 300, 90)
+            draw_text(screen, str(score), 32, 'white', 300, 120)
                 
             for car in cars:
                 car.move()
