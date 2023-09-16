@@ -34,13 +34,13 @@ def draw_configuration_screen(screen):
     text_input_max_speed = font.render(str(max_speed), True, (0, 0, 0))
     screen.blit(text_input_max_speed, (455, 305))
 
-    pygame.draw.rect(screen, (0, 0, 255), (200, 500, 200, 50))
-    text = font.render("Iniciar Jogo", True, (255, 255, 255))
-    screen.blit(text, (250, 512))
+    # pygame.draw.rect(screen, (0, 0, 255), (200, 500, 200, 50))
+    # text = font.render("Iniciar Jogo", True, (255, 255, 255))
+    # screen.blit(text, (250, 512))
 
-    pygame.draw.rect(screen, (0, 0, 255), (400, 500, 200, 50))
-    text = font.render("Voltar", True, (255, 255, 255))
-    screen.blit(text, (450, 512))
+    # pygame.draw.rect(screen, (0, 0, 255), (400, 500, 200, 50))
+    # text = font.render("Voltar", True, (255, 255, 255))
+    # screen.blit(text, (450, 512))
 
 
 # function to activate/deactivate sound player
@@ -125,13 +125,6 @@ cars = []
 num_cars = 5
 car_count = 0
 
-
-# min_speed_ui = '0'
-# max_speed_ui = '1'
-
-# min_speed = string_to_integer(min_speed_ui)
-# max_speed = string_to_integer(max_speed_ui)
-
 min_speed = ''
 max_speed = ''
 
@@ -165,9 +158,14 @@ redline = create_redlines(screen_width, screen_height, dot_spacing, hard_gap)
 
 game_state = ''
 selected_option = 0 # index of menu_options
-menu_options = ['iniciar jogo', 'sobre o jogo', 'pontuações', 'sair do jogo']
+menu_options = ['Iniciar Jogo', 'Sobre o Jogo', 'Pontuações', 'Sair do Jogo']
 menu_options_gap = 70
 
+config_selected = 0 # index of config_options
+config_options = ['Iniciar Jogo', 'Voltar']
+config_options_gap = 70
+
+enter_pressed = False
 space_pressed = False
 paused = False
 running = True
@@ -187,11 +185,13 @@ max_speed_chars = 2
 
 game_state = GameState.change_state(GameState.menu)
 
-if game_state == GameState.game:
-    for _ in range(num_cars):
-        random_car_color = random.choice(car_colors)
-        check_green("green")
-        car = create_car(random_car_color)
+
+# for _ in range(num_cars):
+#     random_car_color = random.choice(car_colors)
+#     check_green("green")
+#     car = create_car(random_car_color)
+
+
 
 while running:
 
@@ -344,22 +344,71 @@ while running:
         if not down_pressed:
             last_down_pressed = False
 
-        if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
-        
-            if selected_option == 0:
-                game_state = GameState.change_state(GameState.config)
-            elif selected_option == 1:
-                game_state = GameState.change_state(GameState.about)
-            elif selected_option == 2:
-                game_state = GameState.change_state(GameState.score)
-            elif selected_option == 3:
-                running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                if not enter_pressed:
+                    enter_pressed = True
+                
+                    if selected_option == 0:
+                        game_state = GameState.change_state(GameState.config)
+                    elif selected_option == 1:
+                        game_state = GameState.change_state(GameState.about)
+                    elif selected_option == 2:
+                        game_state = GameState.change_state(GameState.score)
+                    elif selected_option == 3:
+                        running = False
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_RETURN:
+                enter_pressed = False
 
         pygame.display.update()
 
     elif game_state == GameState.config:
 
         draw_configuration_screen(screen)
+
+        for i, option in enumerate(config_options):
+            if i == config_selected:
+                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * config_options_gap)
+            else:
+                draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * config_options_gap)
+
+        keys = pygame.key.get_pressed()
+
+        up_pressed = keys[pygame.K_UP]
+        down_pressed = keys[pygame.K_DOWN]
+
+        if up_pressed:
+            config_selected = (config_selected - 1) % len(config_options) if not last_up_pressed else config_selected
+            last_up_pressed = True
+
+        if down_pressed:
+            config_selected = (config_selected + 1) % len(config_options) if not last_down_pressed else config_selected
+            last_down_pressed = True
+
+        if not up_pressed:
+            last_up_pressed = False
+
+        if not down_pressed:
+            last_down_pressed = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+
+                if not enter_pressed:
+                    enter_pressed = True
+
+                    if config_selected == 0:
+                        game_state = GameState.change_state(GameState.game)
+                    elif config_selected == 1:
+                        game_state = GameState.change_state(GameState.menu)
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_RETURN:
+                enter_pressed = False
+        
+
         pygame.display.update()
 
 
