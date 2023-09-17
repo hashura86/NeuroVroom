@@ -16,15 +16,14 @@ from states.gameState import GameState
 
 # function to draw configuration screen
 def draw_configuration_screen(screen):
-
-    global active_name, input_rect, player_name, min_speed, max_speed, input_min_speed_rect, input_max_speed_rect
+    global active_input, input_rect, player_name, min_speed, max_speed, input_min_speed_rect, input_max_speed_rect
 
     screen.fill((173, 216, 230)) 
 
     font = pygame.font.Font(None, 36)
 
     draw_text(screen, 'Nome do paciente:', 25, 'black', 50, 100)
-    color = (255, 0, 0) if active_name else (0, 0, 0)
+    color = (255, 0, 0) if active_input == 'name' else (0, 0, 0)
     pygame.draw.rect(screen, color, input_rect , 2)  
     text_input = font.render(player_name, True, (0, 0, 0))
     screen.blit(text_input, (305, 105))
@@ -32,12 +31,12 @@ def draw_configuration_screen(screen):
     draw_text(screen, 'Velocidade mínima dos carros:', 19, 'black', 50, 250)
     draw_text(screen, 'Velocidade máxima dos carros:', 19, 'black', 50, 300)   
 
-    color_min = (255, 0, 0) if active_min_speed else (0, 0, 0)
+    color_min = (255, 0, 0) if active_input == 'min_speed' else (0, 0, 0)
     pygame.draw.rect(screen, color_min, input_min_speed_rect, 2)
     text_input_min_speed = font.render(str(min_speed), True, (0, 0, 0))
     screen.blit(text_input_min_speed, (455, 255))
 
-    color_max = (255, 0, 0) if active_max_speed else (0, 0, 0)
+    color_max = (255, 0, 0) if active_input == 'max_speed' else (0, 0, 0)
     pygame.draw.rect(screen, color_max, input_max_speed_rect, 2)
     text_input_max_speed = font.render(str(max_speed), True, (0, 0, 0))
     screen.blit(text_input_max_speed, (455, 305))
@@ -173,9 +172,7 @@ input_rect = pygame.Rect(300, 100, 300, 36)
 input_min_speed_rect = pygame.Rect(450, 250, 50, 36)
 input_max_speed_rect = pygame.Rect(450, 300, 50, 36)
 
-active_name = False
-active_max_speed = False
-active_min_speed = False
+active_input = None
 
 player_name = ''
 max_chars = 19
@@ -196,27 +193,19 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if input_rect.collidepoint(event.pos):
-                active_name = True
-                active_min_speed = False  
-                active_max_speed = False 
+                active_input = "name"
             elif input_min_speed_rect.collidepoint(event.pos):
-                active_min_speed = True
-                active_name = False  
-                active_max_speed = False  
+                active_input = "min_speed"
             elif input_max_speed_rect.collidepoint(event.pos):
-                active_max_speed = True
-                active_name = False  
-                active_min_speed = False 
+                active_input = "max_speed"
             else:
-                active_name = False
-                active_min_speed = False
-                active_max_speed = False
-
+                active_input = None
+            
         elif event.type == pygame.KEYDOWN:
 
             # type player name/click in the input box
             if game_state == GameState.config:
-                if active_name == True:
+                if active_input == 'name':
                     if event.key == pygame.K_BACKSPACE:
                         player_name = player_name[:-1]   
                     elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
@@ -226,7 +215,7 @@ while running:
                             player_name += event.unicode
 
                 # type min_speed/click in the input box
-                if active_min_speed:
+                if active_input == 'min_speed':
                     if event.key == pygame.K_BACKSPACE:
                         min_speed = min_speed[:-1]
                     elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
@@ -241,7 +230,7 @@ while running:
                                 min_speed += event.unicode
 
                 # type max_speed/click in the input box
-                if active_max_speed:
+                if active_input == 'max_speed':
                     if event.key == pygame.K_BACKSPACE:
                         max_speed = max_speed[:-1]
                     elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
