@@ -7,6 +7,14 @@ from utils.utils import *
 from objects.car import Car
 from states.gameState import GameState
 
+
+# def draw_countdown():
+#     screen.fill((0, 0, 0))
+#     for i in range (3):
+#         draw_text(screen, str(i), 50, 'white', 580, 360)
+#     pygame.display.flip()
+
+# function to draw configuration screen
 def draw_configuration_screen(screen):
 
     global active_name, input_rect, player_name, min_speed, max_speed, input_min_speed_rect, input_max_speed_rect
@@ -33,15 +41,6 @@ def draw_configuration_screen(screen):
     pygame.draw.rect(screen, color_max, input_max_speed_rect, 2)
     text_input_max_speed = font.render(str(max_speed), True, (0, 0, 0))
     screen.blit(text_input_max_speed, (455, 305))
-
-    # pygame.draw.rect(screen, (0, 0, 255), (200, 500, 200, 50))
-    # text = font.render("Iniciar Jogo", True, (255, 255, 255))
-    # screen.blit(text, (250, 512))
-
-    # pygame.draw.rect(screen, (0, 0, 255), (400, 500, 200, 50))
-    # text = font.render("Voltar", True, (255, 255, 255))
-    # screen.blit(text, (450, 512))
-
 
 # function to activate/deactivate sound player
 def play_music(path):
@@ -72,12 +71,12 @@ def create_car(color):
     x = random.uniform(*random.choices(spawn_intervals, weights = [0.5, 0.5], k = num_cars)[0])    
     if x <= 0:
         y = random.choice([bwd_lanes[0], bwd_lanes[1]])
-        car = Car(color, x, y, False, random.randint(min_speed, max_speed))
+        car = Car(color, x, y, False, random.randint(int(min_speed), int(max_speed)))
         car_count += 1
 
     else:
         y = random.choice([fwd_lanes[0], fwd_lanes[1]])
-        car = Car(color, x, y, True, random.randint(min_speed, max_speed))
+        car = Car(color, x, y, True, random.randint(int(min_speed), int(max_speed)))
         car_count += 1
         car.flip_image()
 
@@ -182,16 +181,9 @@ player_name = ''
 max_chars = 19
 max_speed_chars = 2
 
+config_ready = False
 
 game_state = GameState.change_state(GameState.menu)
-
-
-# for _ in range(num_cars):
-#     random_car_color = random.choice(car_colors)
-#     check_green("green")
-#     car = create_car(random_car_color)
-
-
 
 while running:
 
@@ -230,9 +222,10 @@ while running:
                     elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
                         pass
                     else:   
-                        if len(player_name) < max_chars and event.unicode.isalpha():  
+                        if len(player_name) < max_chars and (event.unicode.isalpha() or event.unicode == ' '):  
                             player_name += event.unicode
 
+                # type min_speed/click in the input box
                 if active_min_speed:
                     if event.key == pygame.K_BACKSPACE:
                         min_speed = min_speed[:-1]
@@ -247,7 +240,7 @@ while running:
                             elif event.unicode.isdigit():
                                 min_speed += event.unicode
 
-
+                # type max_speed/click in the input box
                 if active_max_speed:
                     if event.key == pygame.K_BACKSPACE:
                         max_speed = max_speed[:-1]
@@ -261,6 +254,9 @@ while running:
                                 pass
                             elif event.unicode.isdigit():
                                 max_speed += event.unicode
+
+                if (max_speed and min_speed and player_name) and enter_pressed:
+                    config_ready = True                    
 
                     
             if game_state == GameState.game:   
@@ -312,7 +308,12 @@ while running:
                 if game_time <= 0:
                     running = False
 
-                    
+
+    if config_ready:
+        for _ in range(num_cars):
+            random_car_color = random.choice(car_colors)
+            check_green("green")
+            car = create_car(random_car_color)
 
     if game_state == GameState.menu:
         
@@ -416,6 +417,8 @@ while running:
 
         if not paused:
 
+            # draw_countdown()
+
             play_music('sound/game-theme.mp3')
 
             draw_scenario(screen, 0, 0, 'assets/background.png')
@@ -428,6 +431,7 @@ while running:
                 
             for car in cars:
                 car.move()
+                
 
                 if car.rect.x > screen_width + 121 or car.rect.x < -301: # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
                     cars.remove(car)
@@ -435,11 +439,13 @@ while running:
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color) 
+                    
 
                 if car_count < num_cars: # force to always have <num_cars> cars on the screen
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color)
+                    
                     
                 check_sin_move(sin_moviment)
                 car.draw(screen)   
