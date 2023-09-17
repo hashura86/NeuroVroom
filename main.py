@@ -14,6 +14,19 @@ from states.gameState import GameState
 #         draw_text(screen, str(i), 50, 'white', 580, 360)
 #     pygame.display.flip()
 
+def save_data():
+    global player_name, score
+    actual_date = datetime.datetime.now()
+    formated_date = actual_date.strftime("%d/%m/%Y %H:%M:%S")
+
+    with open("player-data/dados_jogador.txt", "a") as arquivo:
+        arquivo.write(f"Nome do jogador: {player_name}\n")
+        arquivo.write(f"Pontuacao: {score}\n")
+        arquivo.write(f"Velocidade Minima: {min_speed}\n")
+        arquivo.write(f"Velocidade Maxima: {max_speed}\n")
+        arquivo.write(f"Data e hora: {formated_date}\n")
+        arquivo.write("\n")
+
 # function to draw configuration screen
 def draw_configuration_screen(screen):
     global active_input, input_rect, player_name, min_speed, max_speed, input_min_speed_rect, input_max_speed_rect
@@ -112,8 +125,6 @@ pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 10000))
 game_time = 90
 
 score = 0
-
-actual_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") # chamar qd salvar o score, e fechar a tela do jogo
 
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
 expected_color_path = car_colors[2]
@@ -295,6 +306,7 @@ while running:
             if not paused: 
                 game_time -= 1
                 if game_time <= 0:
+                    save_data()
                     running = False
 
 
