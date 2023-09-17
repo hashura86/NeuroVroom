@@ -2,7 +2,7 @@ import pygame, pygame.mixer
 import random
 import math
 import datetime
-import re
+import json
 from utils.utils import *
 from objects.car import Car
 from states.gameState import GameState
@@ -19,13 +19,26 @@ def save_data():
     actual_date = datetime.datetime.now()
     formated_date = actual_date.strftime("%d/%m/%Y %H:%M:%S")
 
-    with open("player-data/dados_jogador.txt", "a") as arquivo:
-        arquivo.write(f"Nome do jogador: {player_name}\n")
-        arquivo.write(f"Pontuacao: {score}\n")
-        arquivo.write(f"Velocidade Minima: {min_speed}\n")
-        arquivo.write(f"Velocidade Maxima: {max_speed}\n")
-        arquivo.write(f"Data e hora: {formated_date}\n")
-        arquivo.write("\n")
+    player_data = {
+        "Nome do jogador": player_name,
+        "Pontuacao": score,
+        "Velocidade Minima": min_speed,
+        "Velocidade Maxima": max_speed,
+        "Data": formated_date
+    }
+
+
+    try:
+        with open("player-data/dados_jogador.json", "r") as arquivo:
+            dados_jogador = json.load(arquivo)
+    except FileNotFoundError:
+        dados_jogador = []
+    dados_jogador.append(player_data)
+
+    with open("player-data/dados_jogador.json", "w") as arquivo:
+        json.dump(dados_jogador, arquivo, indent=4) 
+    arquivo.write("\n")
+
 
 # function to draw configuration screen
 def draw_configuration_screen(screen):
