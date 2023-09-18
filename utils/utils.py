@@ -47,6 +47,10 @@ def draw_score_screen(screen):
 
         y += 50
 
+        text = font.render("Voltar", True, (255, 0, 0)) 
+        text_rect = text.get_rect(center=(1000,600))
+        screen.blit(text, text_rect)
+
 # function to draw text on screen 
 def draw_text(surface, text, size, color, x, y):
     font = pygame.font.Font('freesansbold.ttf', size)

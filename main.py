@@ -306,6 +306,11 @@ while running:
                         pygame.mixer.music.pause() 
                     else:
                         pygame.mixer.music.unpause()
+            
+            if game_state == GameState.score:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        game_state = GameState.change_state(GameState.menu)
 
 
         # event to spawn cars, and the first car spawns in different time interval                
