@@ -14,8 +14,9 @@ from states.gameState import GameState
 #         draw_text(screen, str(i), 50, 'white', 580, 360)
 #     pygame.display.flip()
 
+# function to save player data as JSON
 def save_data():
-    global player_name, score
+
     actual_date = datetime.datetime.now()
     formated_date = actual_date.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -27,7 +28,6 @@ def save_data():
         "Data": formated_date
     }
 
-
     try:
         with open("player-data/dados_jogador.json", "r") as arquivo:
             dados_jogador = json.load(arquivo)
@@ -37,7 +37,7 @@ def save_data():
 
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
-    arquivo.write("\n")
+
 
 
 # function to draw configuration screen
@@ -135,7 +135,7 @@ pygame.time.set_timer(pygame.USEREVENT, 1000)
 SPAWN_CAR = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 10000))
 
-game_time = 90
+game_time = 20 #90
 
 score = 0
 
