@@ -312,6 +312,11 @@ while running:
                     if event.key == pygame.K_RETURN:
                         game_state = GameState.change_state(GameState.menu)
 
+            if game_state == GameState.about:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        game_state = GameState.change_state(GameState.menu)
+
 
         # event to spawn cars, and the first car spawns in different time interval                
         elif event.type == SPAWN_CAR and game_state == GameState.game:
@@ -479,7 +484,7 @@ while running:
 
     elif game_state == GameState.about:
 
-        screen.fill((173, 216, 230)) 
+        draw_about_screen(screen) 
                
                              
     pygame.display.flip()
