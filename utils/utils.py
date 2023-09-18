@@ -1,12 +1,51 @@
-import os , datetime, pygame
+import os , datetime, pygame, json
 
 
-def string_to_integer(input_str):
+# function to load player info from txt
+def read_player_data():
     try:
-        result = int(input_str)
-        return result
-    except ValueError:
-        return "Error: Input cannot be converted to an integer"
+        with open("player-data/dados_jogador.json", "r") as arquivo:
+            data = json.load(arquivo)
+            player_info = []
+            for entry in data:
+                player_info.append({
+                    "Nome do jogador": entry["Nome do jogador"],
+                    "Pontuacao": entry["Pontuacao"],
+                    "Data": entry["Data"]
+                })
+            return player_info
+    except FileNotFoundError:
+        return []
+    
+# function to draw player info
+def draw_score_screen(screen):
+    font = pygame.font.Font(None, 36)
+    screen.fill((173, 216, 230)) 
+    player_data = read_player_data()
+
+    title_font = pygame.font.Font(None, 36)
+    title_x = [0, 210, 550]
+    title_labels = ["Nome", "Pontos", "Data"]
+
+    for i in range(len(title_labels)):
+        title_text = title_font.render(title_labels[i], True, (0, 0, 0))
+        title_rect = title_text.get_rect(center=(title_x[i] + 100, 75))
+        screen.blit(title_text, title_rect)
+
+    x, y = 50, 100
+
+    for player_info in player_data:
+
+        text = font.render(f"{player_info['Nome do jogador']}", True, (0, 0, 0))
+        screen.blit(text, (x, y))
+        
+        text = font.render(f"{player_info['Pontuacao']}", True, (0, 0, 0))
+        screen.blit(text, (x + 250, y))
+        
+        text = font.render(f"{player_info['Data']}", True, (0, 0, 0))
+        screen.blit(text, (x + 500, y))
+
+        y += 50
 
 # function to draw text on screen 
 def draw_text(surface, text, size, color, x, y):

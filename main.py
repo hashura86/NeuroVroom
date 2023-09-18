@@ -14,6 +14,8 @@ from states.gameState import GameState
 #         draw_text(screen, str(i), 50, 'white', 580, 360)
 #     pygame.display.flip()
 
+
+
 # function to save player data as JSON
 def save_data():
 
@@ -465,18 +467,16 @@ while running:
                 car.draw(screen)   
 
 
-        elif game_state == GameState.score:
+    elif game_state == GameState.score:
 
-            # draw_scenario(screen, 0, 0, 'assets/menu.png')
-            screen.fill((173, 216, 230)) 
+        draw_score_screen(screen)
             
 
-        elif game_state == GameState.about:
+    elif game_state == GameState.about:
 
-            # draw_scenario(screen, 0, 0, 'assets/menu.png')
-            screen.fill((173, 216, 230)) 
+        screen.fill((173, 216, 230)) 
                
                              
-        pygame.display.flip()
+    pygame.display.flip()
 
 pygame.quit()
