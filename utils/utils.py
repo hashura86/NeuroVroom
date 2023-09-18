@@ -1,6 +1,6 @@
 import os , datetime, pygame, json
 
-
+# function to draw about screen
 def draw_about_screen(screen):
     font = pygame.font.Font(None, 36)
     screen.fill((173, 216, 230))
@@ -83,15 +83,7 @@ def create_redlines(screen_width, screen_height, dot_spacing, gap):
         pygame.draw.circle(redline, (255, 0, 0), (screen_width/2 - gap, y), 5)
     
     return redline
-# function to create redline with a specific gap
-def create_redlines(screen_width, screen_height, dot_spacing, gap):
-    redline = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
-    
-    for y in range(0, screen_height, dot_spacing):
-        pygame.draw.circle(redline, (255, 0, 0), (screen_width/2 + gap, y), 5)
-        pygame.draw.circle(redline, (255, 0, 0), (screen_width/2 - gap, y), 5)
-    
-    return redline
+
 # function to extract the color from img path
 def extract_color_from_path(image_path):
     file_name = os.path.basename(image_path)
