@@ -135,9 +135,9 @@ random_color = "verde"
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 SPAWN_CAR = pygame.USEREVENT + 1
-pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 10000))
+pygame.time.set_timer(SPAWN_CAR, random.randint(1000, 4000))
 
-game_time = 20 #90
+game_time = 90
 
 score = 0
 
@@ -188,6 +188,8 @@ menu_options_gap = 70
 config_selected = 0 # index of config_options
 config_options = ['Iniciar Jogo', 'Voltar']
 config_options_gap = 70
+
+bonk = pygame.mixer.Sound('sound/bonk.mp3')
 
 enter_pressed = False
 space_pressed = False
@@ -295,6 +297,7 @@ while running:
                 if event.key == pygame.K_SPACE:
                     for car in cars:
                         if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
+                            bonk.play()
                             print(car.rect.x)
                             space_pressed = True
                             score += 1
