@@ -208,7 +208,6 @@ config_options_gap = 70
 bonk = pygame.mixer.Sound('sound/bonk.mp3')
 
 enter_pressed = False
-space_pressed = False
 paused = False
 running = True
 
@@ -333,7 +332,7 @@ while running:
                 # hit space buttom to score (or not) a point
                 if event.key == pygame.K_SPACE:
                     for car in cars:
-                        if car.color == expected_color and (car.rect.x > redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
+                        if car.color == expected_color and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
                             car.hit = False
                             bonk.play()
                             print(car.rect.x)
@@ -363,7 +362,6 @@ while running:
             if not paused: 
                 create_car("assets/car-green.png") 
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
-                space_pressed = False
                 print('[SPAWN]', seconds_to_min(game_time))
 
         # USEREVENT to decrease game_time
