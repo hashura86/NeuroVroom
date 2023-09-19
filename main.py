@@ -1,8 +1,5 @@
 import pygame, pygame.mixer
-import random
-import math
-import datetime
-import json
+import random, math, datetime, json
 from utils.utils import *
 from objects.car import Car
 from states.gameState import GameState
@@ -117,12 +114,12 @@ def create_car(color):
     x = random.uniform(*random.choices(spawn_intervals, weights = [0.5, 0.5], k = num_cars)[0])    
     if x <= 0:
         y = random.choice([bwd_lanes[0], bwd_lanes[1]])
-        car = Car(color, x, y, False, random.randint(int(min_speed), int(max_speed)))
+        car = Car(color, x, y, False, random.randint(int(min_speed), int(max_speed)), True)
         car_count += 1
 
     else:
         y = random.choice([fwd_lanes[0], fwd_lanes[1]])
-        car = Car(color, x, y, True, random.randint(int(min_speed), int(max_speed)))
+        car = Car(color, x, y, True, random.randint(int(min_speed), int(max_speed)), True)
         car_count += 1
         car.flip_image()
 
@@ -336,11 +333,10 @@ while running:
                 # hit space buttom to score (or not) a point
                 if event.key == pygame.K_SPACE:
                     for car in cars:
-                        if car.color == expected_color and (car.rect.x > redline_position[0] and car.rect.x <= redline_position[1]) and not space_pressed:  
+                        if car.color == expected_color and (car.rect.x > redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
+                            car.hit = False
                             bonk.play()
-                            print(redline_position[0], redline_position[1])
                             print(car.rect.x)
-                            space_pressed = True
                             score += 1
 
                 # caps lock to pause game (and music too :p)
@@ -487,13 +483,10 @@ while running:
 
         if selected_mode == "easy":
             redline_gap = easy_gap
-            # redline_position = easy_mode_lines
         elif selected_mode == "medium":
             redline_gap = medium_gap
-            # redline_position = medium_mode_lines
         elif selected_mode == "hard":
             redline_gap = hard_gap
-            # redline_position = hard_mode_lines
 
         redline = create_redlines(screen_width, screen_height, dot_spacing, redline_gap)
 
@@ -514,21 +507,20 @@ while running:
             for car in cars:
                 car.move()
                 
-
-                if car.rect.x > screen_width + 121 or car.rect.x < -301: # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
+                # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
+                if car.rect.x > screen_width + 121 or car.rect.x < -301: 
                     cars.remove(car)
                     car_count -= 1
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color) 
                     
-
-                if car_count < num_cars: # force to always have <num_cars> cars on the screen
+                # force to always have <num_cars> cars on the screen
+                if car_count < num_cars: 
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color)
-                    
-                    
+                         
                 check_sin_move(sin_moviment)
                 car.draw(screen)   
 

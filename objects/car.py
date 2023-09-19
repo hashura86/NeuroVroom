@@ -3,7 +3,7 @@ from utils.utils import extract_color_from_path
 
 class Car(pygame.sprite.Sprite):
 
-    def __init__(self, image_path, x, y, dir, speed):
+    def __init__(self, image_path, x, y, dir, speed, hit):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.transform.scale(pygame.image.load(image_path), (100, 60))
         self.rect = self.image.get_rect()
@@ -11,6 +11,7 @@ class Car(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.dir = dir
+        self.hit = hit
         self.width = self.image.get_width()
         self.height = self.image.get_height() 
         self.color = extract_color_from_path(image_path)
