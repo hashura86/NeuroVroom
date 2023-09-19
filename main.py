@@ -15,7 +15,6 @@ from states.gameState import GameState
 #     pygame.display.flip()
 
 
-
 # function to save player data as JSON
 def save_data():
 
@@ -59,15 +58,35 @@ def draw_configuration_screen(screen):
     draw_text(screen, 'Velocidade mínima dos carros:', 19, 'black', 50, 250)
     draw_text(screen, 'Velocidade máxima dos carros:', 19, 'black', 50, 300)   
 
-    color_min = (255, 0, 0) if active_input == 'min_speed' else (0, 0, 0)
-    pygame.draw.rect(screen, color_min, input_min_speed_rect, 2)
+    color = (255, 0, 0) if active_input == 'min_speed' else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_min_speed_rect, 2)
     text_input_min_speed = font.render(str(min_speed), True, (0, 0, 0))
-    screen.blit(text_input_min_speed, (455, 255))
+    screen.blit(text_input_min_speed, (410, 255))
 
-    color_max = (255, 0, 0) if active_input == 'max_speed' else (0, 0, 0)
-    pygame.draw.rect(screen, color_max, input_max_speed_rect, 2)
+    color = (255, 0, 0) if active_input == 'max_speed' else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_max_speed_rect, 2)
     text_input_max_speed = font.render(str(max_speed), True, (0, 0, 0))
-    screen.blit(text_input_max_speed, (455, 305))
+    screen.blit(text_input_max_speed, (410, 305))
+
+    draw_text(screen, 'Modos de jogo:', 19, 'black', 50, 450)
+    draw_text(screen, 'facil:', 19, 'black', 50, 550)  
+    draw_text(screen, 'médio:', 19, 'black', 50, 600)  
+    draw_text(screen, 'difícil:', 19, 'black', 50, 650)  
+
+    color = (255, 0, 0) if active_input == 'easy_mode' else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_easy_mode_rect, 2)
+    easy_mode_rect = font.render('X', True, (0, 0, 0)) if selected_mode == 'easy' else font.render('', True, (0, 0, 0))
+    screen.blit(easy_mode_rect, (215, 555))
+
+    color = (255, 0, 0) if active_input == 'medium_mode' else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_medium_mode_rect, 2)
+    medium_mode_rect = font.render('X', True, (0, 0, 0)) if selected_mode == 'medium' else font.render('', True, (0, 0, 0))
+    screen.blit(medium_mode_rect, (215, 605))
+
+    color = (255, 0, 0) if active_input == 'hard_mode' else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_hard_mode_rect, 2)
+    hard_mode_rect = font.render('X', True, (0, 0, 0)) if selected_mode == 'hard' else font.render('', True, (0, 0, 0))
+    screen.blit(hard_mode_rect, (215, 655))
 
 # function to activate/deactivate sound player
 def play_music(path):
@@ -165,8 +184,13 @@ amplitude = 1
 frequency = .1 
 sin_moviment = False
 
-# easy_mode_lines = [490, 790]
-# medium_mode_lines = [540, 740]
+menu_text_x = 850
+menu_text_y = 350
+
+selected_mode = ''
+
+easy_mode_lines = [490, 790]
+medium_mode_lines = [540, 740]
 hard_mode_lines = [550, 700] # 580 - 700
 
 easy_gap = 150
@@ -174,11 +198,6 @@ medium_gap = 100
 hard_gap = 60
 
 dot_spacing = 20
-
-menu_text_x = 850
-menu_text_y = 350
-
-redline = create_redlines(screen_width, screen_height, dot_spacing, hard_gap)
 
 game_state = ''
 selected_option = 0 # index of menu_options
@@ -197,8 +216,11 @@ paused = False
 running = True
 
 input_rect = pygame.Rect(300, 100, 300, 36)
-input_min_speed_rect = pygame.Rect(450, 250, 50, 36)
-input_max_speed_rect = pygame.Rect(450, 300, 50, 36)
+input_min_speed_rect = pygame.Rect(400, 250, 50, 36)
+input_max_speed_rect = pygame.Rect(400, 300, 50, 36)
+input_easy_mode_rect = pygame.Rect(200, 550, 50, 36)
+input_medium_mode_rect = pygame.Rect(200, 600, 50, 36)
+input_hard_mode_rect = pygame.Rect(200, 650, 50, 36)
 
 active_input = None
 
@@ -226,8 +248,19 @@ while running:
                 active_input = "min_speed"
             elif input_max_speed_rect.collidepoint(event.pos):
                 active_input = "max_speed"
+            elif input_easy_mode_rect.collidepoint(event.pos):
+                selected_mode = "easy"
+                active_input = "easy_mode"
+            elif input_medium_mode_rect.collidepoint(event.pos):
+                selected_mode = "medium"
+                active_input = "medium_mode"                
+            elif input_hard_mode_rect.collidepoint(event.pos):
+                selected_mode = "hard"
+                active_input = "hard_mode"
             else:
                 active_input = None
+
+            
             
         elif event.type == pygame.KEYDOWN:
 
@@ -271,6 +304,13 @@ while running:
                                 pass
                             elif event.unicode.isdigit():
                                 max_speed += event.unicode
+                
+                if selected_mode == 'easy':
+                    redline_position = easy_mode_lines
+                elif selected_mode == 'medium':
+                    redline_position = medium_mode_lines
+                elif selected_mode == 'hard':
+                    redline_position = hard_mode_lines
 
                 if (max_speed and min_speed and player_name) and enter_pressed:
                     config_ready = True                    
@@ -296,8 +336,9 @@ while running:
                 # hit space buttom to score (or not) a point
                 if event.key == pygame.K_SPACE:
                     for car in cars:
-                        if car.color == expected_color and (car.rect.x > hard_mode_lines[0] and car.rect.x <= hard_mode_lines[1]) and not space_pressed:  
+                        if car.color == expected_color and (car.rect.x > redline_position[0] and car.rect.x <= redline_position[1]) and not space_pressed:  
                             bonk.play()
+                            print(redline_position[0], redline_position[1])
                             print(car.rect.x)
                             space_pressed = True
                             score += 1
@@ -443,6 +484,18 @@ while running:
 
 
     elif game_state == GameState.game:
+
+        if selected_mode == "easy":
+            redline_gap = easy_gap
+            # redline_position = easy_mode_lines
+        elif selected_mode == "medium":
+            redline_gap = medium_gap
+            # redline_position = medium_mode_lines
+        elif selected_mode == "hard":
+            redline_gap = hard_gap
+            # redline_position = hard_mode_lines
+
+        redline = create_redlines(screen_width, screen_height, dot_spacing, redline_gap)
 
         if not paused:
 
