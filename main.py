@@ -151,7 +151,7 @@ random_color = "verde"
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 SPAWN_CAR = pygame.USEREVENT + 1
-pygame.time.set_timer(SPAWN_CAR, random.randint(1000, 4000))
+pygame.time.set_timer(SPAWN_CAR, random.randint(2000, 4000))
 
 game_time = 90
 
