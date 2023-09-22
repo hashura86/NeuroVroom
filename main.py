@@ -4,14 +4,6 @@ from utils.utils import *
 from objects.car import Car
 from states.gameState import GameState
 
-
-# def draw_countdown():
-#     screen.fill((0, 0, 0))
-#     for i in range (3):
-#         draw_text(screen, str(i), 50, 'white', 580, 360)
-#     pygame.display.flip()
-
-
 # function to save player data as JSON
 def save_data():
 
@@ -186,8 +178,8 @@ menu_text_y = 350
 
 selected_mode = ''
 
-easy_mode_lines = [490, 790]
-medium_mode_lines = [540, 740]
+easy_mode_lines = [480, 790]
+medium_mode_lines = [520, 740]
 hard_mode_lines = [550, 700] # 580 - 700
 
 easy_gap = 150
@@ -257,15 +249,16 @@ while running:
                 active_input = None
 
             
-            
         elif event.type == pygame.KEYDOWN:
 
             # type player name/click in the input box
             if game_state == GameState.config:
                 if active_input == 'name':
                     if event.key == pygame.K_BACKSPACE:
-                        player_name = player_name[:-1]   
-                    elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
+                        player_name = player_name[:-1]
+
+                    # just to dont print 'enter' unicode       
+                    elif event.key == pygame.K_RETURN:   
                         pass
                     else:   
                         if len(player_name) < max_chars and (event.unicode.isalpha() or event.unicode == ' '):  
@@ -275,7 +268,9 @@ while running:
                 if active_input == 'min_speed':
                     if event.key == pygame.K_BACKSPACE:
                         min_speed = min_speed[:-1]
-                    elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
+
+                    # just to dont print 'enter' unicode    
+                    elif event.key == pygame.K_RETURN:   
                         pass
                     else:
                         if len(min_speed) == 0 and event.unicode.isalpha():
@@ -290,7 +285,9 @@ while running:
                 if active_input == 'max_speed':
                     if event.key == pygame.K_BACKSPACE:
                         max_speed = max_speed[:-1]
-                    elif event.key == pygame.K_RETURN:  # just to dont print 'enter' unicode 
+
+                    # just to dont print 'enter' unicode    
+                    elif event.key == pygame.K_RETURN:   
                         pass
                     else:
                         if len(max_speed) == 0 and event.unicode.isalpha():
@@ -498,7 +495,7 @@ while running:
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
 
-            draw_text(screen, "aperte 'espaço' quando o carro " + random_color + " passar pela área vermelha", 32, 'white', 200, 20)
+            draw_text(screen, "aperte 'ESPAÇO' quando o carro " + random_color + " ficar na área vermelha", 32, 'white', 200, 20)
             draw_text(screen, seconds_to_min(game_time), 32, 'white', 300, 90)
             draw_text(screen, str(score), 32, 'white', 300, 120)
                 
