@@ -178,8 +178,8 @@ menu_text_y = 350
 
 selected_mode = ''
 
-easy_mode_lines = [480, 790]
-medium_mode_lines = [520, 740]
+easy_mode_lines = [435, 790]
+medium_mode_lines = [490, 740]
 hard_mode_lines = [550, 700] # 580 - 700
 
 easy_gap = 150
@@ -247,6 +247,16 @@ while running:
                 active_input = "hard_mode"
             else:
                 active_input = None
+
+            # hit mouse buttons to score (or not :p) a point
+            if game_state == GameState.game:
+                if event.button == 1 or event.button == 3:
+                    for car in cars:
+                        if car.color == expected_color and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
+                            car.hit = False
+                            bonk.play()
+                            print(car.rect.x)
+                            score += 1
 
             
         elif event.type == pygame.KEYDOWN:
@@ -326,14 +336,6 @@ while running:
                     else:
                         screen = pygame.display.set_mode((screen_width, screen_height))
 
-                # hit space buttom to score (or not) a point
-                if event.key == pygame.K_SPACE:
-                    for car in cars:
-                        if car.color == expected_color and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
-                            car.hit = False
-                            bonk.play()
-                            print(car.rect.x)
-                            score += 1
 
                 # caps lock to pause game (and music too :p)
                 if event.key == pygame.K_CAPSLOCK:
@@ -495,7 +497,7 @@ while running:
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
 
-            draw_text(screen, "aperte 'ESPAÇO' quando o carro " + random_color + " ficar na área vermelha", 32, 'white', 200, 20)
+            draw_text(screen, "Clique no mouse quando o carro " + random_color + " ficar dentro da área vermelha", 32, 'white', 200, 20)
             draw_text(screen, seconds_to_min(game_time), 32, 'white', 300, 90)
             draw_text(screen, str(score), 32, 'white', 300, 120)
                 
