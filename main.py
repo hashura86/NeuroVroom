@@ -497,7 +497,7 @@ while running:
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
 
-            draw_text(screen, "Clique no mouse quando o carro " + random_color + " ficar dentro da área vermelha", 32, 'white', 200, 20)
+            draw_text(screen, "Clique no mouse quando o carro " + random_color + " ficar dentro da área vermelha", 32, 'white', 150, 20)
             draw_text(screen, seconds_to_min(game_time), 32, 'white', 300, 90)
             draw_text(screen, str(score), 32, 'white', 300, 120)
                 
