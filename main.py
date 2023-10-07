@@ -136,9 +136,7 @@ music_started = False
 fullscreen = False
 
 colors = ["azul", "vermelho", "verde", "roxo", "cinza"]
-# random_color = random.choice(colors)
 random_color = "verde"
-# expected_color_index = colors.index(random_color)
 
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
@@ -178,7 +176,7 @@ menu_text_y = 350
 
 selected_mode = ''
 
-easy_mode_lines = [435, 790]
+easy_mode_lines = [350, 900]
 medium_mode_lines = [490, 740]
 hard_mode_lines = [550, 700] # 580 - 700
 
@@ -252,11 +250,21 @@ while running:
             if game_state == GameState.game:
                 if event.button == 1 or event.button == 3:
                     for car in cars:
-                        if car.color == expected_color and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
-                            car.hit = False
-                            bonk.play()
-                            print(car.rect.x)
-                            score += 1
+                        # cars moving left => right
+                        if car.dir:
+                            if car.color == expected_color and (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and car.hit:  
+                                print(car.rect.topright[0])
+                                car.hit = False
+                                bonk.play()
+                                score += 1
+                        # cars moving right => left
+                        else:
+                            # it could be car.rect.topleft[0] instead but its working :p
+                            if car.color == expected_color and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
+                                print(car.rect.x)
+                                car.hit = False
+                                bonk.play()
+                                score += 1    
 
             
         elif event.type == pygame.KEYDOWN:
@@ -488,8 +496,6 @@ while running:
         redline = create_redlines(screen_width, screen_height, dot_spacing, redline_gap)
 
         if not paused:
-
-            # draw_countdown()
 
             play_music('sound/game-theme.mp3')
 
