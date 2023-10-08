@@ -15,6 +15,7 @@ def save_data():
         "Pontuacao": score,
         "Velocidade Minima": min_speed,
         "Velocidade Maxima": max_speed,
+        "Status": patient_status,
         "Data": formated_date
     }
 
@@ -146,6 +147,7 @@ pygame.time.set_timer(SPAWN_CAR, random.randint(2000, 4000))
 game_time = 90
 
 score = 0
+patient_status = ''
 
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
 expected_color_path = car_colors[2]
@@ -154,6 +156,7 @@ expected_color = extract_color_from_path(expected_color_path)
 cars = []
 num_cars = 5
 car_count = 0
+green_count = 0
 
 min_speed = ''
 max_speed = ''
@@ -176,9 +179,9 @@ menu_text_y = 350
 
 selected_mode = ''
 
-easy_mode_lines = [350, 900]
-medium_mode_lines = [490, 740]
-hard_mode_lines = [550, 700] # 580 - 700
+easy_mode_lines = [490, 790]
+medium_mode_lines = [540, 740]
+hard_mode_lines = [580, 700]
 
 easy_gap = 150
 medium_gap = 100
@@ -213,6 +216,10 @@ active_input = None
 player_name = ''
 max_chars = 19
 max_speed_chars = 2
+
+# severe_limit = 1000
+# moderate_limit = 500
+# slight_limit = 200
 
 config_ready = False
 
@@ -251,22 +258,25 @@ while running:
                 if event.button == 1 or event.button == 3:
                     for car in cars:
                         # cars moving left => right
-                        if car.dir:
-                            if car.color == expected_color and (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and car.hit:  
-                                print(car.rect.topright[0])
-                                car.hit = False
-                                bonk.play()
-                                score += 1
-                        # cars moving right => left
-                        else:
-                            # it could be car.rect.topleft[0] instead but its working :p
-                            if car.color == expected_color and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]) and car.hit:  
-                                print(car.rect.x)
-                                car.hit = False
-                                bonk.play()
-                                score += 1    
+                        
+                        if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) 
+                                                                or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:  
+                            print(car.rect.topright[0])
+                            car.hit = False
+                            bonk.play()
+                            score += 1
 
-            
+                    # patient status based on score        
+                    if score <= 3:
+                        patient_status = 'identificacao de tempo de resposta severo'
+                    elif score > 3 and score <=7:
+                        patient_status = 'identificacao de tempo de resposta moderado'
+                    elif score > 7 and score <=9:
+                        patient_status = 'identificacao de tempo de resposta leve'
+                    elif score > 9: 
+                        patient_status = 'identificacao de tempo de resposta normal'
+
+                               
         elif event.type == pygame.KEYDOWN:
 
             # type player name/click in the input box
@@ -368,8 +378,11 @@ while running:
         elif event.type == SPAWN_CAR and game_state == GameState.game:
             if not paused: 
                 create_car("assets/car-green.png") 
+                green_count += 1
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
-                print('[SPAWN]', seconds_to_min(game_time))
+                print('[SPAWN]',green_count, seconds_to_min(game_time))
+                
+                
 
         # USEREVENT to decrease game_time
         elif event.type == pygame.USEREVENT and game_state == GameState.game:
@@ -509,7 +522,30 @@ while running:
                 
             for car in cars:
                 car.move()
-                
+                #REMOVE THIS AFTER, JUST FOR TESTING
+                if car.color == 'green':
+                    if redline_gap == easy_gap:
+                        pygame.draw.line(screen, (255,0,0), (car.rect.x, 425), (car.rect.x,425), 5)
+                        if car.rect.x >=490 and car.rect.x <=790:
+                            pygame.draw.line(screen, (0,255,0), (car.rect.x, 425), (car.rect.x,425), 5)
+                        pygame.draw.line(screen, (255,0,0), (car.rect.topright[0], 425), (car.rect.topright[0],425), 5)
+                        if car.rect.topright[0] >=490 and car.rect.topright[0] <=790:
+                            pygame.draw.line(screen, (0,255,0), (car.rect.topright[0], 425), (car.rect.topright[0],425), 5)
+                    elif redline_gap == medium_gap:
+                        pygame.draw.line(screen, (255,0,0), (car.rect.x, 425), (car.rect.x,425), 5)
+                        if car.rect.x >=540 and car.rect.x <=740:
+                            pygame.draw.line(screen, (0,255,0), (car.rect.x, 425), (car.rect.x,425), 5)
+                        pygame.draw.line(screen, (255,0,0), (car.rect.topright[0], 425), (car.rect.topright[0],425), 5)
+                        if car.rect.topright[0] >=540 and car.rect.topright[0] <=740:
+                            pygame.draw.line(screen, (0,255,0), (car.rect.topright[0], 425), (car.rect.topright[0],425), 5)
+                    elif redline_gap == hard_gap:
+                        pygame.draw.line(screen, (255,0,0), (car.rect.x, 425), (car.rect.x,425), 5)
+                        if car.rect.x >=580 and car.rect.x <=700:
+                            pygame.draw.line(screen, (0,255,0), (car.rect.x, 425), (car.rect.x,425), 5)
+                        pygame.draw.line(screen, (255,0,0), (car.rect.topright[0], 425), (car.rect.topright[0],425), 5)
+                        if car.rect.topright[0] >=580 and car.rect.topright[0] <=700:
+                            pygame.draw.line(screen, (0,255,0), (car.rect.topright[0], 425), (car.rect.topright[0],425), 5)
+                    
                 # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
                 if car.rect.x > screen_width + 121 or car.rect.x < -301: 
                     cars.remove(car)
