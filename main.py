@@ -271,9 +271,9 @@ while running:
                         patient_status = 'identificacao de tempo de resposta severo'
                     elif score > 3 and score <=7:
                         patient_status = 'identificacao de tempo de resposta moderado'
-                    elif score > 7 and score <=9:
+                    elif score > 7 and score <=10:
                         patient_status = 'identificacao de tempo de resposta leve'
-                    elif score > 9: 
+                    elif score > 10: 
                         patient_status = 'identificacao de tempo de resposta normal'
 
                                
