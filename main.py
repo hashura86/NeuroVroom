@@ -258,22 +258,24 @@ while running:
                 if event.button == 1 or event.button == 3:
                     for car in cars:
                         # cars moving left => right
-                        
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) 
-                                                                or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:  
-                            print(car.rect.topright[0])
+                                                                or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
+                              
                             car.hit = False
                             bonk.play()
-                            score += 1
+                            if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
+                                score += 3
+                            else:
+                                score += 1
 
                     # patient status based on score        
-                    if score <= 3:
+                    if score <= 7:
                         patient_status = 'identificacao de tempo de resposta severo'
-                    elif score > 3 and score <=7:
+                    elif score > 7 and score <=15:
                         patient_status = 'identificacao de tempo de resposta moderado'
-                    elif score > 7 and score <=10:
+                    elif score > 15 and score <=25:
                         patient_status = 'identificacao de tempo de resposta leve'
-                    elif score > 10: 
+                    elif score > 25: 
                         patient_status = 'identificacao de tempo de resposta normal'
 
                                
