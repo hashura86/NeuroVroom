@@ -130,7 +130,7 @@ screen_width = 1280
 screen_height = 720
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("comoqcaR")
+pygame.display.set_caption("NeuroVroom")
 
 music_started = False
 
@@ -518,9 +518,9 @@ while running:
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
 
-            draw_text(screen, "Clique no mouse quando o carro " + random_color + " ficar dentro da área vermelha", 32, 'white', 150, 20)
-            draw_text(screen, seconds_to_min(game_time), 32, 'white', 300, 90)
-            draw_text(screen, str(score), 32, 'white', 300, 120)
+            # draw_text(screen, "Clique no mouse quando o carro " + random_color + " ficar dentro da área vermelha", 32, 'white', 150, 20)
+            # draw_text(screen, seconds_to_min(game_time), 32, 'white', 300, 90)
+            # draw_text(screen, str(score), 32, 'white', 300, 120)
                 
             for car in cars:
                 car.move()

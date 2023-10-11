@@ -84,7 +84,7 @@ def create_redlines(screen_width, screen_height, dot_spacing, gap):
     
     return redline
 
-# function to extract the color from img path
+# function to extract the color from img path (if target car is always green, this function is useless :p)
 def extract_color_from_path(image_path):
     file_name = os.path.basename(image_path)
     file_name_without_extension = os.path.splitext(file_name)[0]
