@@ -291,8 +291,9 @@ while running:
                     elif event.key == pygame.K_RETURN:   
                         pass
                     else:   
-                        if len(player_name) < max_chars and (event.unicode.isalpha() or event.unicode == ' '):  
-                            player_name += event.unicode
+                        if len(player_name) < max_chars and (event.unicode.isalpha() or event.unicode == ' '):
+                            if event.unicode.isascii():  
+                                player_name += event.unicode
 
                 # type min_speed/click in the input box
                 if active_input == 'min_speed':
