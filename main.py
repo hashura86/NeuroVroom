@@ -257,7 +257,7 @@ while running:
             if game_state == GameState.game:
                 if event.button == 1 or event.button == 3:
                     for car in cars:
-                        # cars moving left => right
+
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) 
                                                                 or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
                               
