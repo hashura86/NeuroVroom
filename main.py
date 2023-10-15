@@ -15,6 +15,7 @@ def save_data():
         "Pontuacao": score,
         "Velocidade Minima": min_speed,
         "Velocidade Maxima": max_speed,
+        "Modo de Jogo": game_mode,
         "Status": patient_status,
         "Data": formated_date
     }
@@ -217,6 +218,8 @@ player_name = ''
 max_chars = 19
 max_speed_chars = 2
 
+game_mode = ''
+
 # severe_limit = 1000
 # moderate_limit = 500
 # slight_limit = 200
@@ -331,10 +334,13 @@ while running:
                 
                 if selected_mode == 'easy':
                     redline_position = easy_mode_lines
+                    game_mode = 'facil'
                 elif selected_mode == 'medium':
                     redline_position = medium_mode_lines
+                    game_mode = 'medio'
                 elif selected_mode == 'hard':
                     redline_position = hard_mode_lines
+                    game_mode = 'dificil'
 
                 if (max_speed and min_speed and player_name) and enter_pressed:
                     config_ready = True                    
