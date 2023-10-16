@@ -11,7 +11,7 @@ def save_data():
     formated_date = actual_date.strftime("%d/%m/%Y %H:%M:%S")
 
     player_data = {
-        "Nome do jogador": player_name,
+        "Nome do jogador": player_name.title(),
         "Pontuacao": score,
         "Velocidade Minima": min_speed,
         "Velocidade Maxima": max_speed,
