@@ -1,5 +1,5 @@
 import pygame, pygame.mixer
-import random, math, datetime, json
+import random, datetime, json
 from utils.utils import *
 from objects.car import Car
 from states.gameState import GameState
@@ -31,33 +31,28 @@ def save_data():
         json.dump(dados_jogador, arquivo, indent=4) 
 
 # check when a car enters the redline to save the first time annotation
-def check_car_in_redline():
+def get_t1_redline(car):
     global t1, car_in_redline
 
     if car.color == 'green' and not car_in_redline:
+        # if redline_gap == easy_gap and (car.rect.x >=490 and car.rect.x <=790) or (car.rect.topright[0] >=490 and car.rect.topright[0] <=790):
+        #     t1 = pygame.time.get_ticks()
+        #     car_in_redline = True
+        
         if redline_gap == easy_gap:
-            if car.rect.x >=490 and car.rect.x <=790:
-                t1 = pygame.time.get_ticks()
+            if not car.dir and car.rect.x >=490:
+                t1 = pygame.time.get_ticks() 
                 car_in_redline = True
-            if car.rect.topright[0] >=490 and car.rect.topright[0] <=790:
-                t1 = pygame.time.get_ticks()
-                car_in_redline = True
+            elif car.dir and car.rect.topright[0] <= 790:
+                t1 = pygame.time.get_ticks() 
+                car_in_redline = True   
 
-        elif redline_gap == medium_gap:
-            if car.rect.x >=540 and car.rect.x <=740:
-                t1 = pygame.time.get_ticks()
-                car_in_redline = True
-            if car.rect.topright[0] >=540 and car.rect.topright[0] <=740:
-                t1 = pygame.time.get_ticks()
-                car_in_redline = True
-
-        elif redline_gap == hard_gap:
-            if car.rect.x >=580 and car.rect.x <=700:
-                t1 = pygame.time.get_ticks()
-                car_in_redline = True
-            if car.rect.topright[0] >=580 and car.rect.topright[0] <=700:
-                t1 = pygame.time.get_ticks()
-                car_in_redline = True
+        elif redline_gap == medium_gap and (car.rect.x >=540 and car.rect.x <=740) or (car.rect.topright[0] >=540 and car.rect.topright[0] <=740):
+            t1 = pygame.time.get_ticks()
+            car_in_redline = True
+        elif redline_gap == hard_gap and (car.rect.x >=580 and car.rect.x <=700) or (car.rect.topright[0] >=580 and car.rect.topright[0] <=700):
+            t1 = pygame.time.get_ticks()
+            car_in_redline = True
 
 # function to draw configuration screen
 def draw_configuration_screen(screen):
@@ -111,17 +106,10 @@ def play_music(path):
     global music_started
     if not music_started:
         pygame.mixer.music.load(path)
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(0.25)
         pygame.mixer.music.play(-1)
         music_started = True
     return music_started
-
-# funtion to activate/deactivate sin function in moviment
-def check_sin_move(movement):
-    global amplitude, frequency
-    if movement:
-        y_offset = amplitude * math.sin(frequency * elapsed_time)
-        car.rect.y += y_offset 
 
 # function to generate other car color if appears a green one
 def check_green(color):
@@ -191,16 +179,10 @@ max_speed = ''
 
 tickrate = 60
 
-elapsed_time = 0
-
 spawn_intervals =[[-300, 0], [1280, 1400]] 
 
 fwd_lanes = [200, 320]
 bwd_lanes = [450, 580]
-
-amplitude = 1
-frequency = .1 
-sin_moviment = False
 
 menu_text_x = 850
 menu_text_y = 350
@@ -260,8 +242,7 @@ game_state = GameState.change_state(GameState.menu)
 while running:
 
     clock.tick(tickrate)
-    elapsed_time += 1
-
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -289,15 +270,14 @@ while running:
             if game_state == GameState.game and not paused:
 
                 if event.button == 1 or event.button == 3:
-                    
                     for car in cars:
-                        if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) 
-                                                                or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
+                        if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
+                            
                             t2 = pygame.time.get_ticks()
                             print('t1:',t1)
                             print('t2:',t2)
-                            delta_t = (t2 - t1)/1000
-                            print('TEMPO DE REAÇAO', delta_t,' seg')
+                            delta_t = abs(t2 - t1)/1000
+                            print('TEMPO DE REAÇAO', delta_t,'seg')
                             car.hit = False
                             bonk.play()
                             if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
@@ -378,8 +358,7 @@ while running:
 
                 if (max_speed and min_speed and player_name) and enter_pressed:
                     config_ready = True                    
-
-                    
+         
             if game_state == GameState.game:   
                 
                 # disable/enable sound
@@ -396,7 +375,6 @@ while running:
                         screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
                     else:
                         screen = pygame.display.set_mode((screen_width, screen_height))
-
 
                 # caps lock to pause game (and music too :p)
                 if event.key == pygame.K_CAPSLOCK:
@@ -416,7 +394,6 @@ while running:
                     if event.key == pygame.K_RETURN:
                         game_state = GameState.change_state(GameState.menu)
 
-
         # event to spawn cars, and the first car spawns in different time interval                
         elif event.type == SPAWN_CAR and game_state == GameState.game:
             if not paused: 
@@ -425,8 +402,6 @@ while running:
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
                 print('[SPAWN]',green_count, seconds_to_min(game_time))
                 
-                
-
         # USEREVENT to decrease game_time
         elif event.type == pygame.USEREVENT and game_state == GameState.game:
             if not paused: 
@@ -562,7 +537,8 @@ while running:
             for car in cars:
                 car.move()
  
-                check_car_in_redline()
+                get_t1_redline(car)    
+           
                        
                 # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
                 if car.rect.x > screen_width + 121 or car.rect.x < -301: 
@@ -571,14 +547,16 @@ while running:
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color) 
+                    car_in_redline = False
                     
                 # force to always have <num_cars> cars on the screen
                 if car_count < num_cars: 
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color)
-                         
-                check_sin_move(sin_moviment)
+                    car_in_redline = False
+
+                    
                 car.draw(screen)   
 
 
