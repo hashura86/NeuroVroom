@@ -32,27 +32,27 @@ def save_data():
 
 # check when a car enters the redline to save the first time annotation
 def get_t1_redline(car):
-    global t1, car_in_redline
+    global t1, car_in_redline, redline_gap
 
     if car.color == 'green' and not car_in_redline:
         # if redline_gap == easy_gap and (car.rect.x >=490 and car.rect.x <=790) or (car.rect.topright[0] >=490 and car.rect.topright[0] <=790):
         #     t1 = pygame.time.get_ticks()
         #     car_in_redline = True
-        
+
         if redline_gap == easy_gap:
             if not car.dir and car.rect.x >=490:
                 t1 = pygame.time.get_ticks() 
                 car_in_redline = True
-            elif car.dir and car.rect.topright[0] <= 790:
+            if car.dir and car.rect.topright[0] <= 790:
                 t1 = pygame.time.get_ticks() 
                 car_in_redline = True   
 
-        elif redline_gap == medium_gap and (car.rect.x >=540 and car.rect.x <=740) or (car.rect.topright[0] >=540 and car.rect.topright[0] <=740):
-            t1 = pygame.time.get_ticks()
-            car_in_redline = True
-        elif redline_gap == hard_gap and (car.rect.x >=580 and car.rect.x <=700) or (car.rect.topright[0] >=580 and car.rect.topright[0] <=700):
-            t1 = pygame.time.get_ticks()
-            car_in_redline = True
+        # elif redline_gap == medium_gap and (car.rect.x >=540 and car.rect.x <=740) or (car.rect.topright[0] >=540 and car.rect.topright[0] <=740):
+        #     t1 = pygame.time.get_ticks()
+        #     car_in_redline = True
+        # elif redline_gap == hard_gap and (car.rect.x >=580 and car.rect.x <=700) or (car.rect.topright[0] >=580 and car.rect.topright[0] <=700):
+        #     t1 = pygame.time.get_ticks()
+        #     car_in_redline = True
 
 # function to draw configuration screen
 def draw_configuration_screen(screen):
@@ -270,13 +270,12 @@ while running:
             if game_state == GameState.game and not paused:
 
                 if event.button == 1 or event.button == 3:
+                    t2 = pygame.time.get_ticks()
                     for car in cars:
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
-                            
-                            t2 = pygame.time.get_ticks()
                             print('t1:',t1)
                             print('t2:',t2)
-                            delta_t = abs(t2 - t1)/1000
+                            delta_t = (t2 - t1)/1000
                             print('TEMPO DE REAÇAO', delta_t,'seg')
                             car.hit = False
                             bonk.play()
@@ -394,10 +393,11 @@ while running:
                     if event.key == pygame.K_RETURN:
                         game_state = GameState.change_state(GameState.menu)
 
-        # event to spawn cars, and the first car spawns in different time interval                
+        # event to spawn green car, and the first car spawns in different time interval                
         elif event.type == SPAWN_CAR and game_state == GameState.game:
             if not paused: 
                 create_car("assets/car-green.png") 
+                car_in_redline = False
                 green_count += 1
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
                 print('[SPAWN]',green_count, seconds_to_min(game_time))
@@ -547,14 +547,12 @@ while running:
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color) 
-                    car_in_redline = False
                     
                 # force to always have <num_cars> cars on the screen
                 if car_count < num_cars: 
                     random_car_color = random.choice(car_colors)
                     check_green("green")
                     new_car = create_car(random_car_color)
-                    car_in_redline = False
 
                     
                 car.draw(screen)   
