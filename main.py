@@ -36,33 +36,18 @@ def get_t1_redline(car):
     global t1, car_in_redline, redline_gap
 
     if car.color == 'green' and not car_in_redline:
+  
+        if redline_gap == easy_gap and ((not car.dir and car.rect.topright[0] >= 490) or (car.dir and car.rect.x <= 790)):
+            car.t1 = pygame.time.get_ticks()
+            car_in_redline = True
+        elif redline_gap == medium_gap and ((not car.dir and car.rect.topright[0] >= 540) or (car.dir and car.rect.x <= 740)):
+            car.t1 = pygame.time.get_ticks()
+            car_in_redline = True
+        elif redline_gap == hard_gap and ((not car.dir and car.rect.topright[0] >= 580) or (car.dir and car.rect.x <= 700)):
+            car.t1 = pygame.time.get_ticks()
+            car_in_redline = True
 
-        if redline_gap == easy_gap:
-            if not car.dir and car.rect.topright[0] >=490:
-                car.t1 = pygame.time.get_ticks() 
-                car_in_redline = True
-            if car.dir and car.rect.x <= 790:
-                car.t1 = pygame.time.get_ticks() 
-                car_in_redline = True   
-
-        elif redline_gap == medium_gap:
-            if not car.dir and car.rect.topright[0] >=540:
-                car.t1 = pygame.time.get_ticks() 
-                car_in_redline = True
-            if car.dir and car.rect.x <= 740:
-                car.t1 = pygame.time.get_ticks() 
-                car_in_redline = True   
-
-        elif redline_gap == hard_gap:
-            if not car.dir and car.rect.topright[0] >=580:
-                car.t1 = pygame.time.get_ticks() 
-                car_in_redline = True
-            if car.dir and car.rect.x <= 700:
-                car.t1 = pygame.time.get_ticks() 
-                car_in_redline = True   
-
-        
-
+  
 # function to draw configuration screen
 def draw_configuration_screen(screen):
     global active_input, input_rect, player_name, min_speed, max_speed, input_min_speed_rect, input_max_speed_rect
