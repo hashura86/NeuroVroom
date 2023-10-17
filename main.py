@@ -17,6 +17,7 @@ def save_data():
         "Velocidade Maxima": max_speed,
         "Modo de Jogo": game_mode,
         "Status": patient_status,
+        "Tempo de reacao medio": average_react_time_str,
         "Data": formated_date
     }
 
@@ -35,24 +36,32 @@ def get_t1_redline(car):
     global t1, car_in_redline, redline_gap
 
     if car.color == 'green' and not car_in_redline:
-        # if redline_gap == easy_gap and (car.rect.x >=490 and car.rect.x <=790) or (car.rect.topright[0] >=490 and car.rect.topright[0] <=790):
-        #     t1 = pygame.time.get_ticks()
-        #     car_in_redline = True
 
         if redline_gap == easy_gap:
-            if not car.dir and car.rect.x >=490:
-                t1 = pygame.time.get_ticks() 
+            if not car.dir and car.rect.topright[0] >=490:
+                car.t1 = pygame.time.get_ticks() 
                 car_in_redline = True
-            if car.dir and car.rect.topright[0] <= 790:
-                t1 = pygame.time.get_ticks() 
+            if car.dir and car.rect.x <= 790:
+                car.t1 = pygame.time.get_ticks() 
                 car_in_redline = True   
 
-        # elif redline_gap == medium_gap and (car.rect.x >=540 and car.rect.x <=740) or (car.rect.topright[0] >=540 and car.rect.topright[0] <=740):
-        #     t1 = pygame.time.get_ticks()
-        #     car_in_redline = True
-        # elif redline_gap == hard_gap and (car.rect.x >=580 and car.rect.x <=700) or (car.rect.topright[0] >=580 and car.rect.topright[0] <=700):
-        #     t1 = pygame.time.get_ticks()
-        #     car_in_redline = True
+        elif redline_gap == medium_gap:
+            if not car.dir and car.rect.topright[0] >=540:
+                car.t1 = pygame.time.get_ticks() 
+                car_in_redline = True
+            if car.dir and car.rect.x <= 740:
+                car.t1 = pygame.time.get_ticks() 
+                car_in_redline = True   
+
+        elif redline_gap == hard_gap:
+            if not car.dir and car.rect.topright[0] >=580:
+                car.t1 = pygame.time.get_ticks() 
+                car_in_redline = True
+            if car.dir and car.rect.x <= 700:
+                car.t1 = pygame.time.get_ticks() 
+                car_in_redline = True   
+
+        
 
 # function to draw configuration screen
 def draw_configuration_screen(screen):
@@ -229,9 +238,8 @@ max_speed_chars = 2
 
 game_mode = ''
 
-# first and second annotation of time to calculate the reaction time
-t1 = 0 
-t2 = 0
+delta_t_list = []
+average_react_time = None
 
 car_in_redline = False
 
@@ -245,6 +253,7 @@ while running:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            cars.clear()
             running = False
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -270,15 +279,17 @@ while running:
             if game_state == GameState.game and not paused:
 
                 if event.button == 1 or event.button == 3:
-                    t2 = pygame.time.get_ticks()
                     for car in cars:
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
-                            print('t1:',t1)
-                            print('t2:',t2)
-                            delta_t = (t2 - t1)/1000
+                            car.t2 = pygame.time.get_ticks()
+                            delta_t = (car.t2 - car.t1)/1000
                             print('TEMPO DE REAÇAO', delta_t,'seg')
+                            print(delta_t_list)
                             car.hit = False
                             bonk.play()
+
+                            delta_t_list.append(delta_t)
+                            
                             if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
                                 score += 3
                             else:
@@ -293,6 +304,10 @@ while running:
                         patient_status = 'identificacao de tempo de resposta leve'
                     elif score > 25: 
                         patient_status = 'identificacao de tempo de resposta normal'
+
+                    # average react time
+                    average_react_time = average(delta_t_list)
+                    average_react_time_str = f'{average_react_time:.4f}s'
 
                                
         elif event.type == pygame.KEYDOWN:
@@ -402,12 +417,13 @@ while running:
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
                 print('[SPAWN]',green_count, seconds_to_min(game_time))
                 
-        # USEREVENT to decrease game_time
+        # USEREVENT to decrease game_time and save player data when game is done
         elif event.type == pygame.USEREVENT and game_state == GameState.game:
             if not paused: 
                 game_time -= 1
                 if game_time <= 0:
                     save_data()
+                    cars.clear()
                     running = False
 
 
@@ -459,6 +475,7 @@ while running:
                     elif selected_option == 2:
                         game_state = GameState.change_state(GameState.score)
                     elif selected_option == 3:
+                        cars.clear()
                         running = False
 
         elif event.type == pygame.KEYUP:
@@ -538,8 +555,7 @@ while running:
                 car.move()
  
                 get_t1_redline(car)    
-           
-                       
+                  
                 # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
                 if car.rect.x > screen_width + 121 or car.rect.x < -301: 
                     cars.remove(car)

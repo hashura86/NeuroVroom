@@ -12,6 +12,8 @@ class Car(pygame.sprite.Sprite):
         self.rect.y = y
         self.dir = dir
         self.hit = hit
+        self.t1 = 0
+        self.t2 = 0
         self.width = self.image.get_width()
         self.height = self.image.get_height() 
         self.color = extract_color_from_path(image_path)

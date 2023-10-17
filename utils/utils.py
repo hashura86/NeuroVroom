@@ -4,11 +4,13 @@ import os , datetime, pygame, json
 def draw_about_screen(screen):
     font = pygame.font.Font(None, 36)
     screen.fill((173, 216, 230))
-
-
     text = font.render("Voltar", True, (255, 0, 0)) 
     text_rect = text.get_rect(center=(1000,600))
     screen.blit(text, text_rect)
+    
+# function to get a average of a list of numbers
+def average(list):
+    return round(sum(list)/len(list), 4)
 
 # function to load player info from txt
 def read_player_data():
