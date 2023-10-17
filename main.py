@@ -31,6 +31,26 @@ def save_data():
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
 
+def fill_car_list():
+    global car
+    for _ in range(num_cars):
+        random_car_color = random.choice(car_colors)
+        check_green("green")
+        car = create_car(random_car_color)
+
+def show_redline_pos():
+    global redline_position, game_mode
+
+    if selected_mode == 'easy':
+        redline_position = easy_mode_lines
+        game_mode = 'facil'
+    elif selected_mode == 'medium':
+        redline_position = medium_mode_lines
+        game_mode = 'medio'
+    elif selected_mode == 'hard':
+        redline_position = hard_mode_lines
+        game_mode = 'dificil'
+
 #function to get patient average react time
 def get_average_react_time():
     global delta_t_list, average_react_time, average_react_time_str
@@ -382,16 +402,8 @@ while running:
                                 pass
                             elif event.unicode.isdigit():
                                 max_speed += event.unicode
-                
-                if selected_mode == 'easy':
-                    redline_position = easy_mode_lines
-                    game_mode = 'facil'
-                elif selected_mode == 'medium':
-                    redline_position = medium_mode_lines
-                    game_mode = 'medio'
-                elif selected_mode == 'hard':
-                    redline_position = hard_mode_lines
-                    game_mode = 'dificil'
+
+                show_redline_pos()                
 
                 if (max_speed and min_speed and player_name) and enter_pressed:
                     config_ready = True                    
@@ -450,14 +462,10 @@ while running:
 
 
     if config_ready:
-        for _ in range(num_cars):
-            random_car_color = random.choice(car_colors)
-            check_green("green")
-            car = create_car(random_car_color)
+        fill_car_list()
 
     if game_state == GameState.menu:
         
-        # draw_scenario(screen, 0, 0, 'assets/menu.png')
         screen.fill((173, 216, 230)) 
 
         for i, option in enumerate(menu_options):
