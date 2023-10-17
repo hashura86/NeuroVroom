@@ -31,6 +31,62 @@ def save_data():
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
 
+#function to get patient average react time
+def get_average_react_time():
+    global delta_t_list, average_react_time, average_react_time_str
+    if(len(delta_t_list) > 0):
+        average_react_time = average(delta_t_list)
+        average_react_time_str = f'{average_react_time:.3f}s'
+
+#function to get patient status based on score  
+def get_pacient_status():
+    global score, patient_status   
+    if score <= 7:
+        patient_status = 'identificacao de tempo de resposta severo'
+    elif score > 7 and score <=15:
+        patient_status = 'identificacao de tempo de resposta moderado'
+    elif score > 15 and score <=25:
+        patient_status = 'identificacao de tempo de resposta leve'
+    elif score > 25: 
+        patient_status = 'identificacao de tempo de resposta normal'
+
+# function to setup game dificulty
+def setup_mode(mode):
+    global redline_gap
+    gap_mapping = {
+        "easy": easy_gap,
+        "medium": medium_gap,
+        "hard": hard_gap
+    }
+
+    #default value
+    redline_gap = gap_mapping.get(mode, easy_gap)
+
+# function to move cars in screen
+def move_cars():
+    for car in cars:
+        car.move()
+        get_t1_redline(car)    
+        check_cars_in_screen(car)   
+        car.draw(screen) 
+
+# function to check if cars are in screen
+def check_cars_in_screen(car):
+    global new_car, car_count, random_car_color
+    # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
+    if car.rect.x > screen_width + 121 or car.rect.x < -301: 
+        cars.remove(car)
+        car_count -= 1
+        random_car_color = random.choice(car_colors)
+        check_green("green")
+        new_car = create_car(random_car_color) 
+                    
+    # force to always have <num_cars> cars on the screen
+    if car_count < num_cars: 
+        random_car_color = random.choice(car_colors)
+        check_green("green")
+        new_car = create_car(random_car_color)
+
 # check when a car enters the redline to save the first time annotation
 def get_t1_redline(car):
     global t1, car_in_redline, redline_gap
@@ -146,9 +202,6 @@ music_started = False
 
 fullscreen = False
 
-colors = ["azul", "vermelho", "verde", "roxo", "cinza"]
-random_color = "verde"
-
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 SPAWN_CAR = pygame.USEREVENT + 1
@@ -160,8 +213,7 @@ score = 0
 patient_status = ''
 
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
-expected_color_path = car_colors[2]
-expected_color = extract_color_from_path(expected_color_path)
+expected_color = 'green'
 
 cars = []
 num_cars = 5
@@ -238,7 +290,6 @@ while running:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            cars.clear()
             running = False
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -269,10 +320,8 @@ while running:
                             car.t2 = pygame.time.get_ticks()
                             delta_t = (car.t2 - car.t1)/1000
                             print('TEMPO DE REAÇAO', delta_t,'seg')
-                            print(delta_t_list)
                             car.hit = False
                             bonk.play()
-
                             delta_t_list.append(delta_t)
                             
                             if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
@@ -280,19 +329,8 @@ while running:
                             else:
                                 score += 1
 
-                    # patient status based on score        
-                    if score <= 7:
-                        patient_status = 'identificacao de tempo de resposta severo'
-                    elif score > 7 and score <=15:
-                        patient_status = 'identificacao de tempo de resposta moderado'
-                    elif score > 15 and score <=25:
-                        patient_status = 'identificacao de tempo de resposta leve'
-                    elif score > 25: 
-                        patient_status = 'identificacao de tempo de resposta normal'
-
-                    # average react time
-                    average_react_time = average(delta_t_list)
-                    average_react_time_str = f'{average_react_time:.4f}s'
+                    get_pacient_status()
+                    get_average_react_time()
 
                                
         elif event.type == pygame.KEYDOWN:
@@ -408,7 +446,6 @@ while running:
                 game_time -= 1
                 if game_time <= 0:
                     save_data()
-                    cars.clear()
                     running = False
 
 
@@ -460,7 +497,6 @@ while running:
                     elif selected_option == 2:
                         game_state = GameState.change_state(GameState.score)
                     elif selected_option == 3:
-                        cars.clear()
                         running = False
 
         elif event.type == pygame.KEYUP:
@@ -519,12 +555,7 @@ while running:
 
     elif game_state == GameState.game:
 
-        if selected_mode == "easy":
-            redline_gap = easy_gap
-        elif selected_mode == "medium":
-            redline_gap = medium_gap
-        elif selected_mode == "hard":
-            redline_gap = hard_gap
+        setup_mode(selected_mode)
 
         redline = create_redlines(screen_width, screen_height, dot_spacing, redline_gap)
 
@@ -535,30 +566,9 @@ while running:
             draw_scenario(screen, 0, 0, 'assets/background.png')
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
-                
-            for car in cars:
-                car.move()
+
+            move_cars()
  
-                get_t1_redline(car)    
-                  
-                # 300 is the first possible spawn in bottom AND screen_width + 120 is the last possible spawn in top
-                if car.rect.x > screen_width + 121 or car.rect.x < -301: 
-                    cars.remove(car)
-                    car_count -= 1
-                    random_car_color = random.choice(car_colors)
-                    check_green("green")
-                    new_car = create_car(random_car_color) 
-                    
-                # force to always have <num_cars> cars on the screen
-                if car_count < num_cars: 
-                    random_car_color = random.choice(car_colors)
-                    check_green("green")
-                    new_car = create_car(random_car_color)
-
-                    
-                car.draw(screen)   
-
-
     elif game_state == GameState.score:
 
         draw_score_screen(screen)
