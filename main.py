@@ -31,13 +31,15 @@ def save_data():
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
 
+# function to fill cars list 
 def fill_car_list():
-    global car
+    global car, random_car_color
     for _ in range(num_cars):
         random_car_color = random.choice(car_colors)
         check_green("green")
         car = create_car(random_car_color)
 
+# function to set redline position
 def show_redline_pos():
     global redline_position, game_mode
 
@@ -72,7 +74,7 @@ def get_pacient_status():
 
 # function to setup game dificulty
 def setup_mode(mode):
-    global redline_gap
+    global redline_gap, redline
     gap_mapping = {
         "easy": easy_gap,
         "medium": medium_gap,
@@ -81,6 +83,7 @@ def setup_mode(mode):
 
     #default value
     redline_gap = gap_mapping.get(mode, easy_gap)
+    redline = create_redlines(screen_width, screen_height, dot_spacing, redline_gap)
 
 # function to move cars in screen
 def move_cars():
@@ -564,8 +567,6 @@ while running:
     elif game_state == GameState.game:
 
         setup_mode(selected_mode)
-
-        redline = create_redlines(screen_width, screen_height, dot_spacing, redline_gap)
 
         if not paused:
 
