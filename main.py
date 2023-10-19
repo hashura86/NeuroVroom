@@ -196,14 +196,15 @@ def create_car(color):
     x = random.uniform(*random.choices(spawn_intervals, weights = [0.5, 0.5], k = num_cars)[0])    
     if x <= 0:
         y = random.choice([bwd_lanes[0], bwd_lanes[1]])
-        car = Car(color, x, y, False, random.randint(int(min_speed), int(max_speed)), True)
+        car = Car(color, x, y, False, random.uniform(float(min_speed), float(max_speed)), True)
         car_count += 1
 
     else:
         y = random.choice([fwd_lanes[0], fwd_lanes[1]])
-        car = Car(color, x, y, True, random.randint(int(min_speed), int(max_speed)), True)
+        car = Car(color, x, y, True, random.uniform(float(min_speed), float(max_speed)), True)
         car_count += 1
         car.flip_image()
+    print(car.speed)
 
     if isColliding(car,cars) or color == 'assets/car-green.png':
         cars.append(car)
@@ -408,7 +409,7 @@ while running:
 
                 show_redline_pos()                
 
-                if (max_speed and min_speed and player_name) and enter_pressed:
+                if (max_speed and min_speed and player_name and (active_input == 'easy_mode' or active_input == 'medium_mode' or active_input == 'hard_mode')) and enter_pressed:
                     config_ready = True                    
          
             if game_state == GameState.game:   
