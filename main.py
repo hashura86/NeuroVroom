@@ -12,6 +12,7 @@ def save_data():
 
     player_data = {
         "Nome do jogador": player_name.title(),
+        "Idade": player_age,
         "Pontuacao": score,
         "Velocidade Minima": min_speed,
         "Velocidade Maxima": max_speed,
@@ -56,9 +57,11 @@ def show_redline_pos():
 #function to get patient average react time
 def get_average_react_time():
     global delta_t_list, average_react_time, average_react_time_str
-    if(len(delta_t_list) > 0):
-        average_react_time = average(delta_t_list)
+    if delta_t_list:
+        average_react_time = sum(delta_t_list) / len(delta_t_list)
         average_react_time_str = f'{average_react_time:.3f}s'
+    else:
+        average_react_time_str = '0s'
 
 #function to get patient status based on score  
 def get_pacient_status():
@@ -141,8 +144,15 @@ def draw_configuration_screen(screen):
     text_input = font.render(player_name, True, (0, 0, 0))
     screen.blit(text_input, (305, 105))
     
+    draw_text(screen, 'Idade:', 19, 'black', 50, 200)
+
     draw_text(screen, 'Velocidade mínima dos carros:', 19, 'black', 50, 250)
     draw_text(screen, 'Velocidade máxima dos carros:', 19, 'black', 50, 300)   
+
+    color = (255, 0, 0) if active_input == 'player_age' else (0, 0, 0)
+    pygame.draw.rect(screen, color, input_player_age_rect, 2)
+    text_player_age_rect = font.render(str(player_age), True, (0, 0, 0))
+    screen.blit(text_player_age_rect, (410, 205))
 
     color = (255, 0, 0) if active_input == 'min_speed' else (0, 0, 0)
     pygame.draw.rect(screen, color, input_min_speed_rect, 2)
@@ -284,6 +294,7 @@ paused = False
 running = True
 
 input_rect = pygame.Rect(300, 100, 300, 36)
+input_player_age_rect = pygame.Rect(400, 200, 50, 36) 
 input_min_speed_rect = pygame.Rect(400, 250, 50, 36)
 input_max_speed_rect = pygame.Rect(400, 300, 50, 36)
 input_easy_mode_rect = pygame.Rect(200, 550, 50, 36)
@@ -295,6 +306,9 @@ active_input = None
 player_name = ''
 max_chars = 19
 max_speed_chars = 2
+
+player_age = ''
+player_age_chars = 3
 
 game_mode = ''
 
@@ -318,6 +332,8 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if input_rect.collidepoint(event.pos):
                 active_input = "name"
+            elif input_player_age_rect.collidepoint(event.pos):
+                active_input = "player_age"
             elif input_min_speed_rect.collidepoint(event.pos):
                 active_input = "min_speed"
             elif input_max_speed_rect.collidepoint(event.pos):
@@ -372,6 +388,23 @@ while running:
                             if event.unicode.isascii():  
                                 player_name += event.unicode
 
+                # type player age/click in the input box
+                if active_input == 'player_age':
+                    if event.key == pygame.K_BACKSPACE:
+                        player_age = player_age[:-1]
+
+                    # just to dont print 'enter' unicode    
+                    elif event.key == pygame.K_RETURN:   
+                        pass
+                    else:
+                        if len(player_age) == 0 and event.unicode.isalpha():
+                            pass
+                        elif len(player_age) < player_age_chars:
+                            if not player_age and event.unicode == '0':
+                                pass
+                            elif event.unicode.isdigit():
+                                player_age += event.unicode
+
                 # type min_speed/click in the input box
                 if active_input == 'min_speed':
                     if event.key == pygame.K_BACKSPACE:
@@ -408,7 +441,7 @@ while running:
 
                 show_redline_pos()                
 
-                if (max_speed and min_speed and player_name and (active_input == 'easy_mode' or active_input == 'medium_mode' or active_input == 'hard_mode')) and enter_pressed:
+                if (max_speed and min_speed and player_name and player_age and (active_input == 'easy_mode' or active_input == 'medium_mode' or active_input == 'hard_mode')) and enter_pressed:
                     config_ready = True                    
          
             if game_state == GameState.game:   
