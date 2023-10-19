@@ -204,7 +204,6 @@ def create_car(color):
         car = Car(color, x, y, True, random.uniform(float(min_speed), float(max_speed)), True)
         car_count += 1
         car.flip_image()
-    print(car.speed)
 
     if isColliding(car,cars) or color == 'assets/car-green.png':
         cars.append(car)
