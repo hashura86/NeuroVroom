@@ -18,7 +18,7 @@ def save_data():
         "Velocidade Maxima": max_speed,
         "Modo de Jogo": game_mode,
         "Status": patient_status,
-        "Tempo de reacao medio": average_react_time_str,
+        "Tempo de reacao medio": average_react_time_str if len(delta_t_list) > 0 else '0s',
         "Data": formated_date
     }
 
@@ -61,6 +61,7 @@ def get_average_react_time():
         average_react_time = sum(delta_t_list) / len(delta_t_list)
         average_react_time_str = f'{average_react_time:.3f}s'
     else:
+        average_react_time = 0
         average_react_time_str = '0s'
 
 #function to get patient status based on score  
