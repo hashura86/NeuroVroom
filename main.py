@@ -118,11 +118,11 @@ def check_cars_in_screen(car):
 def get_t1_redline(car):
     global t1, car_in_redline, redline_gap
 
-    if car.color == 'green' and not car_in_redline:
+    if car.color == 'green' and not car.is_in_redline:
   
         if redline_gap == easy_gap and ((not car.dir and car.rect.topright[0] >= 490) or (car.dir and car.rect.x <= 790)):
             car.t1 = pygame.time.get_ticks()
-            car_in_redline = True
+            car.is_in_redline = True
         elif redline_gap == medium_gap and ((not car.dir and car.rect.topright[0] >= 540) or (car.dir and car.rect.x <= 740)):
             car.t1 = pygame.time.get_ticks()
             car_in_redline = True
@@ -484,7 +484,6 @@ while running:
         elif event.type == SPAWN_CAR and game_state == GameState.game:
             if not paused: 
                 create_car("assets/car-green.png") 
-                car_in_redline = False
                 green_count += 1
                 pygame.time.set_timer(SPAWN_CAR, random.randint(5000, 7000)) 
                 print('[SPAWN]',green_count, seconds_to_min(game_time))

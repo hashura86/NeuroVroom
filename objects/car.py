@@ -14,6 +14,7 @@ class Car(pygame.sprite.Sprite):
         self.hit = hit
         self.t1 = 0
         self.t2 = 0
+        self.is_in_redline = False
         self.width = self.image.get_width()
         self.height = self.image.get_height() 
         self.color = extract_color_from_path(image_path)
