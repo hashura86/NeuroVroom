@@ -316,8 +316,6 @@ game_mode = ''
 delta_t_list = []
 average_react_time = None
 
-car_in_redline = False
-
 config_ready = False
 
 game_state = GameState.change_state(GameState.menu)
