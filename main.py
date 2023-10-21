@@ -32,6 +32,13 @@ def save_data():
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
 
+def set_car_score():
+    global score
+    if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
+        score += 3
+    else:
+        score += 1
+
 # function to fill cars list 
 def fill_car_list():
     global car, random_car_color
@@ -125,10 +132,10 @@ def get_t1_redline(car):
             car.is_in_redline = True
         elif redline_gap == medium_gap and ((not car.dir and car.rect.topright[0] >= 540) or (car.dir and car.rect.x <= 740)):
             car.t1 = pygame.time.get_ticks()
-            car_in_redline = True
+            car.is_in_redline = True
         elif redline_gap == hard_gap and ((not car.dir and car.rect.topright[0] >= 580) or (car.dir and car.rect.x <= 700)):
             car.t1 = pygame.time.get_ticks()
-            car_in_redline = True
+            car.is_in_redline = True
 
   
 # function to draw configuration screen
@@ -361,11 +368,7 @@ while running:
                             car.hit = False
                             bonk.play()
                             delta_t_list.append(delta_t)
-                            
-                            if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
-                                score += 3
-                            else:
-                                score += 1
+                            set_car_score()
 
                     get_pacient_status()
                     get_average_react_time()
