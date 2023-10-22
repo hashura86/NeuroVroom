@@ -32,12 +32,41 @@ def save_data():
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
 
-def set_car_score():
+# def get_score(time, age):
+#     time_weight = 0.6  
+#     age_weight = 0.4  
+
+#     score = time_weight * (1 / time) - age_weight * (1 / age)
+#     return score
+
+# # caso 1
+# # 23 anos 
+# # tr = 0.644
+
+# # caso 2
+# # 23 anos 
+# # tr = 1.299
+
+# # caso 3
+# # 72 anos 
+# # tr = 0.644             
+
+# # caso 4
+# # 72 anos 
+# # tr = 1.299
+
+
+def set_score():
     global score
     if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
         score += 3
     else:
-        score += 1
+        if car.rect.midtop[0] >=redline_position[0] and car.rect.midtop[0] <= redline_position[1]:
+            score += 2
+        else: 
+            score += 1
+         
+        
 
 # function to fill cars list 
 def fill_car_list():
@@ -72,7 +101,7 @@ def get_average_react_time():
         average_react_time_str = '0s'
 
 #function to get patient status based on score  
-def get_pacient_status():
+def get_pacient_status_by_score():
     global score, patient_status   
     if score <= 7:
         patient_status = 'identificacao de tempo de resposta severo'
@@ -214,12 +243,12 @@ def create_car(color):
     x = random.uniform(*random.choices(spawn_intervals, weights = [0.5, 0.5], k = num_cars)[0])    
     if x <= 0:
         y = random.choice([bwd_lanes[0], bwd_lanes[1]])
-        car = Car(color, x, y, False, random.uniform(float(min_speed), float(max_speed)), True)
+        car = Car(color, x, y, False, random.randint(float(min_speed), float(max_speed)), True)
         car_count += 1
 
     else:
         y = random.choice([fwd_lanes[0], fwd_lanes[1]])
-        car = Car(color, x, y, True, random.uniform(float(min_speed), float(max_speed)), True)
+        car = Car(color, x, y, True, random.randint(float(min_speed), float(max_speed)), True)
         car_count += 1
         car.flip_image()
 
@@ -363,14 +392,17 @@ while running:
                     for car in cars:
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
                             car.t2 = pygame.time.get_ticks()
-                            delta_t = (car.t2 - car.t1)/1000
-                            print('TEMPO DE REAÇAO', delta_t,'seg')
+                            reaction_time = (car.t2 - car.t1)/1000
+                            length_beyond_limit = reaction_time * car.speed
+                            print('speed:',car.speed)
+                            print('delta',length_beyond_limit)
+                            print('TEMPO DE REAÇAO', reaction_time,'seg')
                             car.hit = False
                             bonk.play()
-                            delta_t_list.append(delta_t)
-                            set_car_score()
+                            delta_t_list.append(reaction_time)
+                            set_score()
 
-                    get_pacient_status()
+                    get_pacient_status_by_score()
                     get_average_react_time()
 
                                
@@ -609,6 +641,9 @@ while running:
             draw_scenario(screen, 0, 0, 'assets/background.png')
             draw_scenario(screen, screen_width/2 + 5, 0, 'assets/background.png')
             draw_scenario(screen, 0, 0, '', redline)
+
+            draw_text(screen, seconds_to_min(game_time),25,'white', 300, 90)
+            draw_text(screen, str(score),25,'white', 300, 120)
 
             move_cars()
  
