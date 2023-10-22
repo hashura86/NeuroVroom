@@ -18,7 +18,7 @@ def save_data():
         "Velocidade Maxima": max_speed,
         "Modo de Jogo": game_mode,
         "Status": patient_status,
-        "Tempo de reacao medio": average_react_time_str if len(delta_t_list) > 0 else '0s',
+        "Tempo de reacao medio": average_react_time_str if len(delta_t_list) > 0 else '0ms',
         "Data": formated_date
     }
 
@@ -41,7 +41,7 @@ def save_data():
 
 # # caso 1
 # # 23 anos 
-# # tr = 0.644
+# # tr = 0.644  1.0989895 - 0.00017
 
 # # caso 2
 # # 23 anos 
@@ -55,6 +55,21 @@ def save_data():
 # # 72 anos 
 # # tr = 1.299
 
+# def get_score(car):
+#     global tickrate, redline_gap, reaction_time, score
+#     acceptable_window = 2 * redline_gap  
+#     ms_per_frames = 1/tickrate
+#     counted_frames = reaction_time / ms_per_frames
+#     distance_traveled = counted_frames * car.speed
+
+#     if distance_traveled < car.width:
+#         print('car did not go entirely through first line')
+#     elif car.width < distance_traveled < acceptable_window:
+#         print('car within acceptable limits')
+#     elif car.width < distance_traveled < acceptable_window + car.width:
+#         print('car did not go entirely through second line')
+#     else:
+#         print('car out of bounds')
 
 def set_score():
     global score
@@ -392,11 +407,9 @@ while running:
                     for car in cars:
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
                             car.t2 = pygame.time.get_ticks()
-                            reaction_time = (car.t2 - car.t1)/1000
-                            length_beyond_limit = reaction_time * car.speed
+                            reaction_time = (car.t2 - car.t1)
                             print('speed:',car.speed)
-                            print('delta',length_beyond_limit)
-                            print('TEMPO DE REAÇAO', reaction_time,'seg')
+                            print('TEMPO DE REAÇAO', reaction_time,'ms')
                             car.hit = False
                             bonk.play()
                             delta_t_list.append(reaction_time)
