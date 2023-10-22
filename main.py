@@ -110,10 +110,10 @@ def get_average_react_time():
     global delta_t_list, average_react_time, average_react_time_str
     if delta_t_list:
         average_react_time = sum(delta_t_list) / len(delta_t_list)
-        average_react_time_str = f'{average_react_time:.3f}s'
+        average_react_time_str = f'{average_react_time:.3f}ms'
     else:
         average_react_time = 0
-        average_react_time_str = '0s'
+        average_react_time_str = '0ms'
 
 #function to get patient status based on score  
 def get_pacient_status_by_score():
