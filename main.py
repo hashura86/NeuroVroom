@@ -13,7 +13,7 @@ def save_data():
     player_data = {
         "Nome do jogador": player_name.title(),
         "Idade": player_age,
-        "Pontuacao": score,
+        "Pontuacao": round(score,4),
         "Velocidade Minima": min_speed,
         "Velocidade Maxima": max_speed,
         "Modo de Jogo": game_mode,
@@ -53,6 +53,7 @@ def add_score():
         score += 3
     else:
         score += (1 / (reaction_time / 1000)) * get_car_percentage_in_redline() * reaction_time_weight
+        print(score)
 
 
 # function to fill cars list 
