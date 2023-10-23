@@ -46,13 +46,13 @@ def get_car_percentage_in_redline():
             length_in_area = car.width - (redline_position[0] - car.rect.x)    
     return length_in_area / car.width
 
-#function to add the score depending on reaction_time
+# function to add the score depending on reaction_time
 def add_score():
     global score, reaction_time, reaction_time_weitht
     if get_car_percentage_in_redline() == 1:
         score += 3
     else:
-        score += 3 + (1 / (reaction_time / 1000)) * get_car_percentage_in_redline() * reaction_time_weight
+        score += (1 / (reaction_time / 1000)) * get_car_percentage_in_redline() * reaction_time_weight
 
 
 # function to fill cars list 
@@ -338,7 +338,7 @@ game_mode = ''
 delta_t_list = []
 average_react_time = None
 
-reaction_time_weight = 0.8
+reaction_time_weight = 0.6
 
 score = 0
 
