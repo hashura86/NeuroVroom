@@ -32,56 +32,28 @@ def save_data():
     with open("player-data/dados_jogador.json", "w") as arquivo:
         json.dump(dados_jogador, arquivo, indent=4) 
 
-# def get_score(time, age):
-#     time_weight = 0.6  
-#     age_weight = 0.4  
+# function to get car % inside the red area
+def get_car_percentage_in_redline():
+    if not car.dir: 
+        if car.rect.topright[0] <= redline_position[1]:
+            length_in_area = min(car.rect.topright[0] - redline_position[0], car.width)
+        else:
+            length_in_area = car.width - (car.rect.topright[0] - redline_position[1])    
+    else:
+        if car.rect.x >= redline_position[0]:
+            length_in_area = min(redline_position[1] - car.rect.x, car.width)
+        else:
+            length_in_area = car.width - (redline_position[0] - car.rect.x)    
+    return length_in_area / car.width
 
-#     score = time_weight * (1 / time) - age_weight * (1 / age)
-#     return score
-
-# # caso 1
-# # 23 anos 
-# # tr = 0.644  1.0989895 - 0.00017
-
-# # caso 2
-# # 23 anos 
-# # tr = 1.299
-
-# # caso 3
-# # 72 anos 
-# # tr = 0.644             
-
-# # caso 4
-# # 72 anos 
-# # tr = 1.299
-
-# def get_score(car):
-#     global tickrate, redline_gap, reaction_time, score
-#     acceptable_window = 2 * redline_gap  
-#     ms_per_frames = 1/tickrate
-#     counted_frames = reaction_time / ms_per_frames
-#     distance_traveled = counted_frames * car.speed
-
-#     if distance_traveled < car.width:
-#         print('car did not go entirely through first line')
-#     elif car.width < distance_traveled < acceptable_window:
-#         print('car within acceptable limits')
-#     elif car.width < distance_traveled < acceptable_window + car.width:
-#         print('car did not go entirely through second line')
-#     else:
-#         print('car out of bounds')
-
-def set_score():
-    global score
-    if (car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) and (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1]):
+#function to add the score depending on reaction_time
+def add_score():
+    global score, reaction_time, reaction_time_weitht
+    if get_car_percentage_in_redline() == 1:
         score += 3
     else:
-        if car.rect.midtop[0] >=redline_position[0] and car.rect.midtop[0] <= redline_position[1]:
-            score += 2
-        else: 
-            score += 1
-         
-        
+        score += 3 + (1 / (reaction_time / 1000)) * get_car_percentage_in_redline() * reaction_time_weight
+
 
 # function to fill cars list 
 def fill_car_list():
@@ -127,7 +99,7 @@ def get_pacient_status_by_score():
     elif score > 25: 
         patient_status = 'identificacao de tempo de resposta normal'
 
-# function to setup game dificulty
+# function to setup game dificulty (redlines)
 def setup_mode(mode):
     global redline_gap, redline
     gap_mapping = {
@@ -294,7 +266,6 @@ pygame.time.set_timer(SPAWN_CAR, random.randint(2000, 4000))
 
 game_time = 90
 
-score = 0
 patient_status = ''
 
 car_colors = ["assets/car-blue.png", "assets/car-red.png", "assets/car-green.png", "assets/car-purple.png",  "assets/car-gray.png"]
@@ -367,6 +338,10 @@ game_mode = ''
 delta_t_list = []
 average_react_time = None
 
+reaction_time_weight = 0.8
+
+score = 0
+
 config_ready = False
 
 game_state = GameState.change_state(GameState.menu)
@@ -410,10 +385,11 @@ while running:
                             reaction_time = (car.t2 - car.t1)
                             print('speed:',car.speed)
                             print('TEMPO DE REAÇAO', reaction_time,'ms')
+                            print(get_car_percentage_in_redline())
                             car.hit = False
                             bonk.play()
                             delta_t_list.append(reaction_time)
-                            set_score()
+                            add_score()
 
                     get_pacient_status_by_score()
                     get_average_react_time()
