@@ -53,7 +53,7 @@ def add_score():
         score += 3
     else:
         score += (1 / (reaction_time / 1000)) * get_car_percentage_in_redline() * reaction_time_weight
-        print(score)
+        
 
 
 # function to fill cars list 
