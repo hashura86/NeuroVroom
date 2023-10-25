@@ -305,11 +305,11 @@ dot_spacing = 20
 game_state = ''
 selected_option = 0 # index of menu_options
 menu_options = ['Iniciar Jogo', 'Sobre o Jogo', 'Pontuações', 'Sair do Jogo']
-menu_options_gap = 70
+options_gap = 70
 
 config_selected = 0 # index of config_options
 config_options = ['Iniciar Jogo', 'Voltar']
-config_options_gap = 70
+
 
 bonk = pygame.mixer.Sound('sound/bonk.mp3')
 
@@ -529,9 +529,9 @@ while running:
 
         for i, option in enumerate(menu_options):
             if i == selected_option:
-                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
+                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * options_gap)
             else:
-                draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * menu_options_gap)
+                draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * options_gap)
 
         keys = pygame.key.get_pressed()
 
@@ -578,9 +578,9 @@ while running:
 
         for i, option in enumerate(config_options):
             if i == config_selected:
-                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * config_options_gap)
+                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * options_gap)
             else:
-                draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * config_options_gap)
+                draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * options_gap)
 
         keys = pygame.key.get_pressed()
 
