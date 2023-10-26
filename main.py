@@ -265,7 +265,7 @@ pygame.time.set_timer(pygame.USEREVENT, 1000)
 SPAWN_CAR = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_CAR, random.randint(2000, 4000))
 
-game_time = 10
+game_time = 60
 
 patient_status = ''
 
