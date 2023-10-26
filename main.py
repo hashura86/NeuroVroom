@@ -265,7 +265,7 @@ pygame.time.set_timer(pygame.USEREVENT, 1000)
 SPAWN_CAR = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_CAR, random.randint(2000, 4000))
 
-game_time = 60
+game_time = 10
 
 patient_status = ''
 
@@ -287,8 +287,8 @@ spawn_intervals =[[-300, 0], [1280, 1400]]
 fwd_lanes = [200, 320]
 bwd_lanes = [450, 580]
 
-menu_text_x = 850
-menu_text_y = 350
+menu_text_x = 950
+menu_text_y = 325
 
 selected_mode = ''
 
@@ -524,14 +524,14 @@ while running:
         fill_car_list()
 
     if game_state == GameState.menu:
-        
-        screen.fill((173, 216, 230)) 
+        draw_scenario(screen, 0, 0, 'assets/menu.png')
+        # screen.fill((173, 216, 230)) 
 
         for i, option in enumerate(menu_options):
             if i == selected_option:
-                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * options_gap)
-            else:
                 draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * options_gap)
+            else:
+                draw_text(screen, option, 32, (255, 255, 255), menu_text_x, menu_text_y + i * options_gap)
 
         keys = pygame.key.get_pressed()
 
