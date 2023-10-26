@@ -20,8 +20,8 @@ JSON: A biblioteca JSON permitiu a leitura e gravação dos dados do jogador em 
 
 ### Requisitos
 
-1. criar uma pasta 'player-data' para salvar alguns dados importantes em arquivo
-2. criar uma pasta 'sound' para adicionar sons ao jogo (musica no jogo e som caso ocorra uma pontuação)
+1. criar uma pasta 'sound' para adicionar sons ao jogo (musica no jogo e som caso ocorra uma pontuação)
+2. os assets já estão inclusos, pode alterar caso queira
 
 ### Execução
 

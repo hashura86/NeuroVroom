@@ -24,13 +24,13 @@ def save_data():
 
     try:
         with open("player-data/dados_jogador.json", "r") as arquivo:
-            dados_jogador = json.load(arquivo)
+            data = json.load(arquivo)
     except FileNotFoundError:
-        dados_jogador = []
-    dados_jogador.append(player_data)
+        data = []
+    data.append(player_data)
 
     with open("player-data/dados_jogador.json", "w") as arquivo:
-        json.dump(dados_jogador, arquivo, indent=4) 
+        json.dump(data, arquivo, indent=4) 
 
 # function to get car % inside the red area
 def get_car_percentage_in_redline():
@@ -83,7 +83,7 @@ def get_average_react_time():
     global delta_t_list, average_react_time, average_react_time_str
     if delta_t_list:
         average_react_time = sum(delta_t_list) / len(delta_t_list)
-        average_react_time_str = f'{average_react_time:.3f}ms'
+        average_react_time_str = f'{average_react_time:.2f}ms'
     else:
         average_react_time = 0
         average_react_time_str = '0ms'
