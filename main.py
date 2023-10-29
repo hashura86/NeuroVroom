@@ -339,7 +339,7 @@ game_mode = ''
 delta_t_list = []
 average_react_time = None
 
-reaction_time_weight = 0.4
+reaction_time_weight = 0.5
 
 score = 0
 
