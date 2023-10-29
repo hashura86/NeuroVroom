@@ -525,7 +525,6 @@ while running:
 
     if game_state == GameState.menu:
         draw_scenario(screen, 0, 0, 'assets/menu.png')
-        # screen.fill((173, 216, 230)) 
 
         for i, option in enumerate(menu_options):
             if i == selected_option:
@@ -578,9 +577,9 @@ while running:
 
         for i, option in enumerate(config_options):
             if i == config_selected:
-                draw_text(screen, option, 32, (255, 0, 0), menu_text_x, menu_text_y + i * options_gap)
-            else:
                 draw_text(screen, option, 32, (0, 0, 0), menu_text_x, menu_text_y + i * options_gap)
+            else:
+                draw_text(screen, option, 32, (255, 255, 255), menu_text_x, menu_text_y + i * options_gap)
 
         keys = pygame.key.get_pressed()
 
