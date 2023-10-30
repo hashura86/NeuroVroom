@@ -23,14 +23,14 @@ def save_data():
     }
 
     try:
-        with open("player-data/dados_jogador.json", "r") as arquivo:
-            data = json.load(arquivo)
+        with open("player-data/dados_jogador.json", "r") as file:
+            data = json.load(file)
     except FileNotFoundError:
         data = []
     data.append(player_data)
 
-    with open("player-data/dados_jogador.json", "w") as arquivo:
-        json.dump(data, arquivo, indent=4) 
+    with open("player-data/dados_jogador.json", "w") as file:
+        json.dump(data, file, indent=4) 
 
 # function to get car % inside the red area
 def get_car_percentage_in_redline():
@@ -54,7 +54,6 @@ def add_score():
     else:
         score += (1 / (reaction_time / 1000)) * get_car_percentage_in_redline() * reaction_time_weight
         
-
 
 # function to fill cars list 
 def fill_car_list():
@@ -93,11 +92,11 @@ def get_pacient_status_by_score():
     global score, patient_status   
     if score <= 7:
         patient_status = 'identificacao de tempo de resposta severo'
-    elif score > 7 and score <=15:
+    elif score > 7 and score <=14:
         patient_status = 'identificacao de tempo de resposta moderado'
-    elif score > 15 and score <=25:
+    elif score > 14 and score <=20:
         patient_status = 'identificacao de tempo de resposta leve'
-    elif score > 25: 
+    elif score > 20: 
         patient_status = 'identificacao de tempo de resposta normal'
 
 # function to setup game dificulty (redlines)
@@ -138,7 +137,7 @@ def check_cars_in_screen(car):
         check_green("green")
         new_car = create_car(random_car_color)
 
-# check when a car enters the redline to save the first time annotation
+# check when a green car touch the redline to save the first time annotation
 def get_t1_redline(car):
     global t1, car_in_redline, redline_gap
 
@@ -311,7 +310,7 @@ config_selected = 0 # index of config_options
 config_options = ['Iniciar Jogo', 'Voltar']
 
 
-bonk = pygame.mixer.Sound('sound/bonk.mp3')
+bonk_sfx = pygame.mixer.Sound('sound/bonk.mp3')
 
 enter_pressed = False
 paused = False
@@ -384,14 +383,12 @@ while running:
                         if car.color == expected_color and ((car.rect.topright[0] >= redline_position[0] and car.rect.topright[0] <= redline_position[1]) or (car.rect.x >= redline_position[0] and car.rect.x <= redline_position[1])) and car.hit:
                             car.t2 = pygame.time.get_ticks()
                             reaction_time = (car.t2 - car.t1)
-                            print('speed:',car.speed)
                             print('TEMPO DE REAÇAO', reaction_time,'ms')
                             print(get_car_percentage_in_redline())
                             car.hit = False
-                            bonk.play()
+                            bonk_sfx.play()
                             delta_t_list.append(reaction_time)
                             add_score()
-
                     get_pacient_status_by_score()
                     get_average_react_time()
 
