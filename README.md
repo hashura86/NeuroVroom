@@ -1,6 +1,6 @@
-# TCC - Exergame para pacientes com lesão cerebral
+# TCC - Uma proposta de exergame para pacientes com lesão cerebral
 
-exergame direcionado a pacientes com lesão cerebral, com o objetivo de promover sua reabilitação cógnitiva.
+protótipo de exergame direcionado a pacientes com lesão cerebral, com o objetivo de promover sua reabilitação cógnitiva.
 
 ## Sumário
 
@@ -16,8 +16,7 @@ JSON: A biblioteca JSON permitiu a leitura e gravação dos dados do jogador em 
 
 ### Requisitos
 
-1. criar uma pasta 'sound' para adicionar sons ao jogo (musica no jogo e som caso ocorra uma pontuação)
-2. os assets já estão inclusos, pode alterar caso queira
+1. python v3.11.5
 
 ### Execução
 
