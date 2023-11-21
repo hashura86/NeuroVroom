@@ -16,7 +16,7 @@ JSON: A biblioteca JSON permitiu a leitura e gravação dos dados do jogador em 
 
 ### Requisitos
 
-1. python v3.11.5
+python v3.11.5
 
 ### Execução
 
